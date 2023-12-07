@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>StrucEng Library Server Log file</title>
+    <style type="text/css">
+
+        .err {
+            color: #EE1100;
+            font-weight: bold
+        }
+
+        .warn {
+            color: #FFCC00;
+            font-weight: bold
+        }
+
+        .info {
+            color: #C0C0C0;
+        }
+
+        .debug {
+            color: #CCA0A0;
+        }
+
+        .log-success {
+            background-color: rgba(29, 255, 0, 0.13);
+        }
+
+        .log-error {
+            background-color: rgba(255, 0, 11, 0.15)
+        }
+
+        .log-entry {
+            font-family: Consolas, "Andale Mono WT", "Andale Mono", "Lucida Console", "Lucida Sans Typewriter", "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Liberation Mono", "Nimbus Mono L", Monaco, "Courier New", Courier, monospace;
+            white-space: pre-wrap;
+            margin: 0;
+            overflow-x: auto;
+        }
+    </style>
+    <script>
+
+         document.addEventListener("DOMContentLoaded", function(event) {
+        });
+
+        window.onbeforeunload = function(e) {
+            localStorage.setItem('scrollpos', window.scrollY);
+        };
+
+        function checkConnectivity(url) {
+            return new Promise((resolve, reject) => {
+                try {
+                    let ws = new WebSocket(url)
+                    ws.onopen = function () {
+                        resolve(true);
+                        ws.close()
+                    }
+                    ws.onerror = function () {
+                        resolve(false)
+                        ws.close()
+                    }
+                } catch (e) {
+                    resolve(false)
+                }
+
+            });
+        }
+
+        function connectOnSuccess(url) {
+            checkConnectivity(url)
+                .then((success) => {
+                    if (success) {
+                        connect(url)
+                    }
+                })
+        }
+
+        function connect(url) {
+            let ws = new WebSocket(url)
+            console.log(url)
+            console.log(ws)
+
+            function appendEntries(entries) {
+                let log = document.getElementById('log')
+                entries.forEach(e => log.appendChild(e))
+            }
+
+            function createEntry(e) {
+                let el = document.createElement('div')
+                el.className = 'log-entry'
+                el.textContent = e
+                let issues = ['warn', 'warning', 'error', 'issue', 'errors', 'fail', 'failed', 'issues', 'warnings', 'unsuccessful']
+                let success = ['ok', 'success', 'successful', 'done']
+
+                console.log(e)
+                // .some((entry) => entry === true)
+                let isSuccess = success.map(i => e.includes(i)).some((a) => a === true)
+                let isError = issues.map(i => e.toLowerCase().includes(i)).some((a) => a === true)
+                console.log(isSuccess)
+
+                if (isError) {
+                    el.className += ' log-error'
+                } else if (isSuccess) {
+                    el.className += ' log-success'
+                }
+                return el
+            }
+
+            function scrollToBottom() {
+                const offset = 100
+                if (window.innerHeight + window.scrollY + offset >= document.body.offsetHeight) {
+                    document.getElementById('bottom').scrollIntoView();
+                }
+            }
+
+            ws.onopen = function (ev) {
+                appendEntries([createEntry("Connected to " + url)])
+            }
+            ws.onerror = function (ev) {
+                console.log(ev)
+            }
+            ws.onmessage = function (event) {
+                let msg
+                try {
+                    msg = JSON.parse(event.data)
+                } catch (e) {
+                    console.error(e)
+                    return
+                }
+                let type = msg['message_type']
+                let message = msg.message
+                try {
+                    message = JSON.parse(msg.message)
+                } catch (e) {
+                    console.log(e)
+                }
+                console.log(type)
+                if (type === 'log-entry') {
+                    let entries = message.split('\\n').map(e => createEntry(e))
+                    appendEntries(entries)
+                } else if (type === 'log-entries') {
+                    let entries = message.flatMap(entry => entry.split('\\n')).map(e => createEntry(e))
+                    appendEntries(entries)
+                        var scrollpos = localStorage.getItem('scrollpos');
+                        if (scrollpos) window.scrollTo(0, scrollpos);
+                        localStorage.setItem('scrollpos', null)
+                }
+                scrollToBottom()
+            };
+        }
+
+        const suffix = window.location.host + '/api/log'
+        const wsUrl = 'ws://' + suffix
+        const wssUrl = 'wss://' + suffix
+        checkConnectivity(wssUrl)
+            .then((success) => {
+                console.log(wssUrl, success)
+                if (success) {
+                    connect(wssUrl)
+                } else {
+                    connect(wsUrl)
+                }
+            });
+    </script>
+</head>
+<body>
+<h1>StrucEng Library Server Log</h1>
+<h2><a href="https://strucenglib.ethz.ch">https://strucenglib.ethz.ch</a></h2>
+<div id="top"></div>
+<div id="log">
+</div>
+<div id="bottom"></div>
+</body>
+</html>

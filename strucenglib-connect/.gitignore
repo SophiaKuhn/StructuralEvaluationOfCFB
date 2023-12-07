@@ -1,0 +1,14 @@
+venv
+.idea
+venv2
+__pycache__
+.idea
+
+/strucenglib_connect/C:\\Temp\\test_____ProgramFiles_Test.inp
+/strucenglib_connect/my_app.log
+/strucenglib_connect/strucenglib_connect.egg-info/
+/strucenglib_connect/strucenglib_connect/my_app.log
+/strucenglib_connect/strucenglib_connect/server/strucenglib_server.log
+/strucenglib_connect/strucenglib_connect/C:\\Temp\\test_____ProgramFiles_Test.inp
+/strucenglib_connect/strucenglib_connect/server/C:\\Temp\\test_____ProgramFiles_Test.inp
+/strucenglib_connect/strucenglib_connect/strucenglib_server.log
