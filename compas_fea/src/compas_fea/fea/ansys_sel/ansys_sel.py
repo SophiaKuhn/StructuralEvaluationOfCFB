@@ -387,7 +387,7 @@ def extract_data(structure, fields, exe, output, return_data, components):
                         
                         gplist.append(stress_dict)  
                     
-                    # Add stresses TOP to the structure      
+                    # Add stresses BOT to the structure      
                     filename = step + '_stresses_bot.txt'
                     
                     isfile_filename=str(out_path) + "\\" + filename
@@ -415,7 +415,66 @@ def extract_data(structure, fields, exe, output, return_data, components):
                         
                         gplist.append(stress_dict)
                 
+                # Principal Strains at each GP
+                # -------------------------------------------------------
+                if 'eps' in fields or 'all' in fields:
+                    
+                    # Add strains TOP to the structure
+                    filename = step + '_strains_top.txt'
+                    
+                    isfile_filename=str(out_path) + "\\" + filename
+                                        
+                         
+                    if os.path.isfile(isfile_filename)==True:          
+                        epsfile = open(os.path.join(out_path, filename), 'r')
+                        eps = epsfile.readlines()
+                                       
+                        
+                        strain_dict = {'GP_name_top': {},'elem_nr_top': {}, 'eps_1_top': {}, 'eps_3_top': {}, 'coor_intp_layer_x_top': {} , 'coor_intp_layer_y_top': {}, 'coor_intp_layer_z_top': {}} 
+                        for i in range(len(ps)):
+                            epsstring = eps[i].split(',')
+                            strain = map(float, epsstring)
+                            key = int(stress[0]) - 1                            
+                            strain_dict['GP_name_top'][key] = float(strain[0])
+                            strain_dict['elem_nr_top'][key] = float(strain[1])
+                            strain_dict['eps_1_top'][key] = float(strain[2])
+                            strain_dict['eps_3_top'][key] = float(strain[3])                            
+                            strain_dict['coor_intp_layer_x_top'][key] = float(strain[4])
+                            strain_dict['coor_intp_layer_y_top'][key] = float(strain[5])
+                            strain_dict['coor_intp_layer_z_top'][key] = float(strain[6])
+                        
+                        gplist.append(strain_dict)  
+                    
 
+                    # Add stresses BOT to the structure                          
+                    filename = step + '_strains_bot.txt'
+                    
+                    isfile_filename=str(out_path) + "\\" + filename
+                                        
+                         
+                    if os.path.isfile(isfile_filename)==True:          
+                        epsfile = open(os.path.join(out_path, filename), 'r')
+                        eps = epsfile.readlines()
+                                       
+                        
+                        strain_dict = {'GP_name_bot': {},'elem_nr_bot': {}, 'eps_1_bot': {}, 'eps_3_bot': {}, 'coor_intp_layer_x_bot': {} , 'coor_intp_layer_y_bot': {}, 'coor_intp_layer_z_bot': {}} 
+                        for i in range(len(ps)):
+                            epsstring = eps[i].split(',')
+                            strain = map(float, epsstring)
+                            key = int(stress[0]) - 1                            
+                            strain_dict['GP_name_bot'][key] = float(strain[0])
+                            strain_dict['elem_nr_bot'][key] = float(strain[1])
+                            strain_dict['eps_1_bot'][key] = float(strain[2])
+                            strain_dict['eps_3_bot'][key] = float(strain[3])                            
+                            strain_dict['coor_intp_layer_x_bot'][key] = float(strain[4])
+                            strain_dict['coor_intp_layer_y_bot'][key] = float(strain[5])
+                            strain_dict['coor_intp_layer_z_bot'][key] = float(strain[6])
+                        
+                        gplist.append(strain_dict)  
+                    
+
+
+                
                 # 
                 # 
                             
