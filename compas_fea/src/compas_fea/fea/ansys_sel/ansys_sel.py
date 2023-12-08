@@ -434,7 +434,7 @@ def extract_data(structure, fields, exe, output, return_data, components):
                         for i in range(len(ps)):
                             epsstring = eps[i].split(',')
                             strain = map(float, epsstring)
-                            key = int(stress[0]) - 1                            
+                            key = int(strain[0]) - 1                            
                             strain_dict['GP_name_top'][key] = float(strain[0])
                             strain_dict['elem_nr_top'][key] = float(strain[1])
                             strain_dict['eps_1_top'][key] = float(strain[2])
@@ -446,7 +446,7 @@ def extract_data(structure, fields, exe, output, return_data, components):
                         gplist.append(strain_dict)  
                     
 
-                    # Add stresses BOT to the structure                          
+                    # Add strian BOT to the structure                          
                     filename = step + '_strains_bot.txt'
                     
                     isfile_filename=str(out_path) + "\\" + filename
@@ -461,7 +461,7 @@ def extract_data(structure, fields, exe, output, return_data, components):
                         for i in range(len(ps)):
                             epsstring = eps[i].split(',')
                             strain = map(float, epsstring)
-                            key = int(stress[0]) - 1                            
+                            key = int(strain[0]) - 1                            
                             strain_dict['GP_name_bot'][key] = float(strain[0])
                             strain_dict['elem_nr_bot'][key] = float(strain[1])
                             strain_dict['eps_1_bot'][key] = float(strain[2])

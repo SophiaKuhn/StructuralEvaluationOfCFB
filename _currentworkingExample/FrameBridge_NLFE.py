@@ -68,7 +68,7 @@ import math as m
 #--------- read Parameter from sampled csv file-------------------------
 
 # define folder where samples and geo is saved
-folder='C:\\CFBData'
+#folder='C:\\CFBData'
 
 # define sampling iteration (= Batch number)
 idx_s = 1
@@ -80,7 +80,10 @@ idx_s = 1
 
 # Read corresponding csv files, where all samples are saved
 # read all sampled variables to a dict
-csv_file_path = folder + '\\{}_Batch\\{}_CFBSamples.csv'.format(idx_s,idx_s)
+current_directory = os.getcwd()
+folder_name='CFBData'
+folder_path = os.path.join(current_directory, folder_name)
+csv_file_path = folder_path+ '\\{}_Batch\\{}_CFBSamples.csv'.format(idx_s,idx_s)
 data_dict = read_csv_to_dict(csv_file_path)
 
 
@@ -106,7 +109,7 @@ for i in range(start,end+1):
     #------------Import Geometry file-----------------------------------
     ID=int(data_dict[""][i])
     # import geometry, layers and UserText from generated 3dm-files
-    filepath=folder+'\\{}_Batch\\{}_{}_CFB\\geo.3dm'.format(idx_s,idx_s,ID) #{}_{}_geo.3dm'.format(idx_s,idx_s,ID)
+    filepath=folder_path+'\\{}_Batch\\{}_{}_CFB\\geo.3dm'.format(idx_s,idx_s,ID) #{}_{}_geo.3dm'.format(idx_s,idx_s,ID)
     rs.Command("!_-Import \"" + filepath + "\" -Enter -Enter")
     
     
@@ -393,7 +396,7 @@ for i in range(start,end+1):
     # Run analyses
     # ------------------------------------------------------------------------------
     # ------------------------------------------------------------------------------
-    mdl.analyse_and_extract(software='ansys_sel', fields=[ 'u', 'sf', 's' ], lstep = ['step_2']) 
+    mdl.analyse_and_extract(software='ansys_sel', fields=[ 'u', 'sf', 's','eps' ], lstep = ['step_2']) 
     
     
     print('Analysis Finished')
@@ -402,9 +405,9 @@ for i in range(start,end+1):
     # # ------------------------------------------------------------------------------
     
     # Plot Results for step_2
-    rhino.plot_data(mdl, lstep='step_2', field='uz', cbar_size=1, source='CMMUsermat')
-    rhino.plot_principal_stresses(mdl, step='step_2', shell_layer='top', scale=10**2)
-    rhino.plot_principal_stresses(mdl, step='step_2', shell_layer='bot', scale=10**2)
+#    rhino.plot_data(mdl, lstep='step_2', field='uz', cbar_size=1, source='CMMUsermat')
+#    rhino.plot_principal_stresses(mdl, step='step_2', shell_layer='top', scale=10**2)
+#    rhino.plot_principal_stresses(mdl, step='step_2', shell_layer='bot', scale=10**2)
 #    rhino.plot_data(mdl, lstep='step_2', field='sf1', cbar_size=1, source='CMMUsermat')
 #    rhino.plot_data(mdl, lstep='step_2', field='sf2', cbar_size=1, source='CMMUsermat')
 #    rhino.plot_data(mdl, lstep='step_2', field='sf3', cbar_size=1, source='CMMUsermat')
@@ -419,20 +422,20 @@ for i in range(start,end+1):
     
     # --------------------------Save Analysis Results -----------------------------------
     # Save the Rhino file
-    folder_path=folder+'\\{}_Batch\\{}_{}_CFB'.format(idx_s, idx_s, ID)
-    if not os.path.exists(folder_path):
-        os.makedirs(folder_path)
+    subfolder_path=folder_path+'\\{}_Batch\\{}_{}_CFB'.format(idx_s, idx_s, ID)
+    if not os.path.exists(subfolder_path):
+        os.makedirs(subfolder_path)
   
     #save structure to a pickle file
     # ATTENTION ich habe das gefuehl, wenn das file schon existiert dann ueberschreibt es das nicht!!S
-    save_to_pickle(obj=mdl, ID=ID, idx_s=idx_s, folder_path=folder_path, name='structure')
+    save_to_pickle(obj=mdl, ID=ID, idx_s=idx_s, folder_path=subfolder_path, name='structure')
     
     
     
     
     # save results dict to a json file
     res_dict=mdl.results
-    save_to_json(save_dict=res_dict,ID=ID,idx_s=idx_s,folder_path=folder_path,
+    save_to_json(save_dict=res_dict,ID=ID,idx_s=idx_s,folder_path=subfolder_path,
                     name='analysisResults')
     
 
