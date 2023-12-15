@@ -36,7 +36,7 @@ esu,0.05
 h_G,1000
 gamma_E,2e-05
 phi_k,30
-q_Gl,4.8
+q_Gl,6.5
 b_Bs,2500
 Q_k,225000
 withMPCs,True

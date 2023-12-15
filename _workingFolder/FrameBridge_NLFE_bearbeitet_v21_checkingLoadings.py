@@ -245,7 +245,7 @@ for i in range(start,end+1):
     # -- define section -- 
     # calc. min number of nn (nn >= tmin/dmin)
     dmin=min(d1,d2,d3,d4)
-    nn_min=tmin/dmin
+    nn_min=tmin/dmin #auf runden
     name_sec ='plate_element_sec'
     mdl.add(ShellSection(name=name_sec, t=t_p, semi_loc_coords=semi_loc_coords, nn=nn_min))
     
@@ -354,52 +354,51 @@ for i in range(start,end+1):
     
     
     # Earth pressure Load generator (characteristic) on Wall 1 and 2
-    earth_pressure_backfill_load = earthPressure_backfill_generator(mdl, layers_walls, h_w, t_p, h_G, gamma_E, phi_k ) #[N/mm2]
+    earth_pressure_backfill_load = earthPressure_backfill_generator(mdl, layers_walls, h_w, t_p, h_G, gamma_E, phi_k, gamma_G=1.35 ) #[N/mm2]
 
     #### Live Loads
     # TODO: iterate over ya! to calculate multiple load positions
     #Normalspurverkehr Load generator 
     # h_Pl here die normale platte hoehe/ thickness, ohne voute - read from sampled parameter
-    live_load_names=Normalspurbahnverkehr_load_generator(mdl,name='Gleis1', l_Pl=L_el, h_Pl=t_p, s=s*b1, beta=beta, q_Gl=q_Gl, b_Bs=b_Bs, h_Strich=h_G, Q_k=Q_k, y_A=2000)
+    NSV_load_names=Normalspurbahnverkehr_load_generator(mdl,name='Gleis1', l_Pl=L_el, h_Pl=t_p, s=s*b1, beta=beta,
+                                                         q_Gl=q_Gl, b_Bs=b_Bs, h_Strich=h_G, Q_k=Q_k, y_A=2000,
+                                                         gamma_G=1.35, gamma_Q=1.45, m=4650 )
+    
+    NSV_dead_loads=[NSV_load_names[0]]
+    NSV_live_loads=NSV_load_names[1:]
+
     
     # Earth pressure load generator (resulting from live load) on wall 1 (only one sided)
-    earth_pressure_liveload = earthPressure_liveload_generator(mdl, s*b1, h_w, t_p, phi_k)
+    earth_pressure_liveload = earthPressure_liveload_generator(mdl, s*b1, h_w, t_p, phi_k, gamma_Q=1.35)
 
     
-#    # Steps
-#    mdl.add([
-#    GeneralStep(name='step_1',   displacements=[ 'nset_pinned_set_disp_1', 'nset_pinned_set_disp_2'] ,  nlgeom=False),
-#    GeneralStep(name='step_2',  loads=['load_gravity'] ,   nlgeom=False, increments=1),
-#    GeneralStep(name='step_3',  loads=earth_pressure_backfill_load ,   nlgeom=False, increments=1),
-#    GeneralStep(name='step_4',  loads=earth_pressure_liveload ,   nlgeom=False, increments=1),
-#    GeneralStep(name='step_5',  loads=live_load_names ,   nlgeom=False),
-#    ])
-#    mdl.steps_order = [ 'step_1', 'step_2', 'step_3', 'step_4', 'step_5']
 
-    # Steps
-    loads_list=['load_gravity']
-    loads_list= loads_list+earth_pressure_backfill_load +live_load_names +earth_pressure_liveload
-    print(loads_list)
+    #Steps
+  
+    dead_loads = ['load_gravity']+ earth_pressure_backfill_load + NSV_dead_loads #+gravel_pressure 
+    live_loads = NSV_live_loads +earth_pressure_liveload
+    
+    #missing: dead load vom Gleis + schwelle (trennen der Loadings function), + dead load from gravel layer
     
     
     mdl.add([
-    GeneralStep(name='step_1',   displacements=[ 'nset_pinned_set_disp_1', 'nset_pinned_set_disp_2'] ,  nlgeom=False),
-    GeneralStep(name='step_2',  loads=loads_list ,   nlgeom=False, increments=1)
+    GeneralStep(name='step_1',  displacements=[ 'nset_pinned_set_disp_1', 'nset_pinned_set_disp_2'] ,  nlgeom=False),
+    GeneralStep(name='step_2',  loads=dead_loads ,   nlgeom=False, increments=1),
+    GeneralStep(name='step_3',  loads=live_loads ,   nlgeom=False, increments=1)
     ])
-    mdl.steps_order = [ 'step_1','step_2']
-    
+    mdl.steps_order = ['step_1','step_2', 'step_3']
 
-    
-    
-    
-    
+
+
+
+   
     # Run analyses
     # ------------------------------------------------------------------------------
     # ------------------------------------------------------------------------------
-    mdl.analyse_and_extract(software='ansys_sel', fields=[ 'u', 'sf', 's','eps' ], lstep = ['step_2']) 
-    
-    
-    print('Analysis Finished')
+    mdl.analyse_and_extract(software='ansys_sel', fields=[ 'u', 'sf', 's','eps' ], lstep = ['step_3']) 
+#    
+#    
+#    print('Analysis Finished')
     # # Plot Results
     # # ------------------------------------------------------------------------------
     # # ------------------------------------------------------------------------------

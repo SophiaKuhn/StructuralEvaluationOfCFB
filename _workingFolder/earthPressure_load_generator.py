@@ -12,7 +12,7 @@ from strucenglib.prepost_functions import area_load_generator_elements
 
 
 
-def earthPressure_backfill_generator(structure, elements, h_w, t_p, h_G, gamma_E, phi_k, verbalise=True):
+def earthPressure_backfill_generator(structure, elements, h_w, t_p, h_G, gamma_E, phi_k, gamma_G=1, verbalise=True):
     
     '''
     This function calculates the earth pressure area load magnitude that results from the backfill and generates the correspondin area load.
@@ -68,7 +68,7 @@ def earthPressure_backfill_generator(structure, elements, h_w, t_p, h_G, gamma_E
     p_f = Ko * gamma_E * h_ep_u #[N/mm2] 
 
     # calculate resulting force  (area of earth pressure)
-    ep_r = p_t * h_ep + 1/2 *p_f * h_ep #[N/mm] # TODO muss hier nicht p_f p_t stehen
+    ep_r = gamma_G*(p_t * h_ep + 1/2 *p_f * h_ep) #[N/mm] # TODO muss hier nicht p_f p_t stehen
 
     # dirtribute uniformily on whole elset hight
     q_ep_r=ep_r/ h_w  #[N/mm2]
@@ -83,7 +83,7 @@ def earthPressure_backfill_generator(structure, elements, h_w, t_p, h_G, gamma_E
     return ['earthPressure_backfill']
 
 
-def earthPressure_liveload_generator(structure, s, h_w, t_p, phi_k, verbalise=True):
+def earthPressure_liveload_generator(structure, s, h_w, t_p, phi_k,gamma_Q=1, verbalise=True):
     
     '''
     This function calculates the earth pressure area load magnitude that results from the live load of a track
@@ -165,7 +165,7 @@ def earthPressure_liveload_generator(structure, s, h_w, t_p, phi_k, verbalise=Tr
     # calculate magnitude of area load
     q = 52 #[N/mm2] #TODO check where this value comes from and weather it has to be varied
     Ko = 1-m.sin(phi_k)
-    ep = Ko * q #[N/mm2]
+    ep = gamma_Q*(Ko * q) #[N/mm2]
 
     # determine which elements are loaded
     loaded_element_numbers=area_load_generator_elements(structure, layer_name)
