@@ -245,9 +245,9 @@ for i in range(start,end+1):
     # -- define section -- 
     # calc. min number of nn (nn >= tmin/dmin)
     dmin=min(d1,d2,d3,d4)
-    nn_min=tmin/dmin #auf runden
+    nn_min=m.ceil(tmin/dmin) #auf runden
     name_sec ='plate_element_sec'
-    mdl.add(ShellSection(name=name_sec, t=t_p, semi_loc_coords=semi_loc_coords, nn=nn_min))
+    mdl.add(ShellSection(name=name_sec, t=t_p, semi_loc_coords=semi_loc_coords, nn=nn_min, offset_mode='top'))
     
     
     
@@ -286,13 +286,13 @@ for i in range(start,end+1):
     
     #calc. min number of nn (nn >= tmin/dmin)
     dmin=min(d1,d2,d3,d4)
-    nn_min=tmin/dmin
+    nn_min=m.ceil(tmin/dmin)
     
     ## Wall 1 ##
     # -- define section-- 
     semi_loc_coords=calc_loc_coor(layer=layers_wall1[0], PORIG=[0,0,-h_w_m],PXAXS=[1,0,0]) 
     name_sec ='wall1_element_sec'
-    mdl.add(ShellSection(name=name_sec, t=t_w, semi_loc_coords=semi_loc_coords, nn=nn_min))
+    mdl.add(ShellSection(name=name_sec, t=t_w, semi_loc_coords=semi_loc_coords, nn=nn_min,offset_mode='mid' ))
     
     for wall in layers_wall1:
         # -- define elset properties -- 
@@ -304,7 +304,7 @@ for i in range(start,end+1):
     # -- define section-- 
     semi_loc_coords=calc_loc_coor(layer=layers_wall2[0], PORIG=[0,L_el,-h_w_m],PXAXS=[1,0,0])     
     name_sec ='wall2_element_sec'
-    mdl.add(ShellSection(name=name_sec, t=t_w, semi_loc_coords=semi_loc_coords, nn=nn_min))
+    mdl.add(ShellSection(name=name_sec, t=t_w, semi_loc_coords=semi_loc_coords, nn=nn_min, offset_mode='mid'))
     
     
     for wall in layers_wall2:
@@ -395,7 +395,7 @@ for i in range(start,end+1):
     # Run analyses
     # ------------------------------------------------------------------------------
     # ------------------------------------------------------------------------------
-    mdl.analyse_and_extract(software='ansys_sel', fields=[ 'u', 'sf', 's','eps' ], lstep = ['step_3']) 
+    mdl.analyse_and_extract(software='ansys_sel', fields=[ 'u','eps','sig_sr' ], lstep = ['step_3'])  #'sf', 's'
 #    
 #    
 #    print('Analysis Finished')
