@@ -249,7 +249,6 @@ class Materials(object):
                 self.blank_line()
                 self.write_line('*do,j,1,{0}'.format(nn))
                 self.write_line('secdata,{0},{1},0,,,j'.format(delta_h,count_mat))
-                print('secoffset,{}'.format(section.offset['mode']))
                 self.write_line('secoffset,{}'.format(section.offset['mode']))
                 self.write_line('*enddo')       
 
