@@ -47,13 +47,14 @@ from strucenglib.prepost_functions import Normalspurbahnverkehr_load_generator
 from strucenglib.prepost_functions import verification
 from strucenglib.sandwichmodel import sandwichmodel_main as SMM
 
+
 #New Functions
 from export import read_csv_to_dict,extract_numbers_from_string #utility functions
 from export import delete_all, joinMeshes_inShellLayers #rhino functions
 from export import save_to_pickle,save_to_json #export_results #export functions
 
 #from strucenglib.prepost_functions.earthPressure_load_generator import earthPressure_calculator,earthPressure_load_generator
-from earthPressure_load_generator import earthPressure_backfill_generator, earthPressure_liveload_generator #,earthPressure_load_generator
+from earthPressure_load_generator import earthPressure_backfill_generator, earthPressure_liveload_generator, earthPressure_gravel_generator #,earthPressure_load_generator
 
 import rhinoscriptsyntax as rs
 import time
@@ -67,8 +68,6 @@ import math as m
 
 #--------- read Parameter from sampled csv file-------------------------
 
-# define folder where samples and geo is saved
-#folder='C:\\CFBData'
 
 # define sampling iteration (= Batch number)
 idx_s = 1
@@ -351,6 +350,7 @@ for i in range(start,end+1):
     # Load of Gravel layer
     
     #Staendigen lasten
+    earthPressure_gravel_generator(mdl, layers_deck, h_G, gamma_E, phi_k, gamma_G=1.35)
     
     
     # Earth pressure Load generator (characteristic) on Wall 1 and 2
@@ -369,7 +369,7 @@ for i in range(start,end+1):
 
     
     # Earth pressure load generator (resulting from live load) on wall 1 (only one sided)
-    earth_pressure_liveload = earthPressure_liveload_generator(mdl, s*b1, h_w, t_p, phi_k, gamma_Q=1.35)
+    earth_pressure_liveload = earthPressure_liveload_generator(mdl, s*b1, h_w, t_p, phi_k, gamma_Q=1.45)
 
     
 

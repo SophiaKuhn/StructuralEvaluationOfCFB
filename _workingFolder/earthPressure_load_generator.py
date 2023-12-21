@@ -12,6 +12,61 @@ from strucenglib.prepost_functions import area_load_generator_elements
 
 
 
+def earthPressure_gravel_generator(structure, elements,h_G, gamma_E, phi_k, gamma_G=1, verbalise=True):
+
+    '''
+    This function calculates the earth pressure area load magnitude that results from the layers of soil that lie above the slab deck.
+    And then this function adds this caluclated load value as a load to the structure object.
+
+    Parameters
+    ----------
+    structure: structureObject
+        the object representing the structure to be analysed
+    elements: List[str]
+        List of the names of the layers, which contain the elements that should be loaded   
+    h_G : float
+        Gravel layer hight [mm]
+    gamma_E : float
+        sp. Weight [N/mm3] (e.g. Verdichteter Schotter 0.000020 N/mm3 )
+    phi_k: int
+        ..[Degree] (e.g. 30)
+    verbalise: bool
+        Defining weather to verbalise the calculation 
+
+
+    Returns
+    ----------
+    List[str]
+        List of load names, which were generated within this function: ['earthPressure_backfill']
+
+    Limitations
+    -------------
+    - NO waterpressure is considered (for low water levels), 
+    - constant gamma_E is considered (for gravel and backfill), so no layerd ground
+    '''
+
+
+    #calc. Ko
+    Ko = 1 - m.sin(m.radians(phi_k))
+
+    # calc eath pressure at slab deck surface (resulting from gravel layer)
+    p = gamma_G*(Ko * gamma_E * h_G) #[N/mm2]  (gamma_E: [N/mm3])
+
+    # verbalise
+    if verbalise:
+        print('The earth pressure resulting from the gravel layer is calculated to be: ', p, ' N/mm2 ;',p*1000, ' kN/m2'  )
+
+    #add load to structur object
+    structure.add(AreaLoad(name='earthPressure_gravel', elements=elements, x=0,y=0,z=-p, axes ='local')) 
+
+    #return the name of the load that was saved to the structure object
+    return ['earthPressure_gravel']
+
+
+
+
+
+
 def earthPressure_backfill_generator(structure, elements, h_w, t_p, h_G, gamma_E, phi_k, gamma_G=1, verbalise=True):
     
     '''
@@ -53,25 +108,29 @@ def earthPressure_backfill_generator(structure, elements, h_w, t_p, h_G, gamma_E
     #-------------------------------------------------------
 
     #calc. Ko
-    Ko = 1 - m.sin(phi_k) 
+    Ko = 1 - m.sin(m.radians(phi_k)) 
 
     # calculate hight over which the earth pressure is active onto the structure
     # (only correct for with offsetmodelling and with MPCs and voute)
     h_ep = h_w  + t_p #[mm]
 
     # celculate earth pressure
-    # at top of slab deck
+    # at top of slab deck (for the sqare of the earth pressure)
     h_ep_o=h_G #[mm]
     p_t = Ko * gamma_E * h_ep_o #[N/mm2]
-    # at foundation hight
-    h_ep_u = h_ep + h_G #[mm]
-    p_f = Ko * gamma_E * h_ep_u #[N/mm2] 
+
+    # at foundation hight (for the triangle of the force pressure)
+    p_f = Ko * gamma_E * h_ep #[N/mm2] 
+
 
     # calculate resulting force  (area of earth pressure)
-    ep_r = gamma_G*(p_t * h_ep + 1/2 *p_f * h_ep) #[N/mm] # TODO muss hier nicht p_f p_t stehen
+    R_sqare=gamma_G* p_t * h_ep 
+    R_triangle = gamma_G*1/2 *p_f * h_ep
+    R_tot=R_sqare+R_triangle
+
 
     # dirtribute uniformily on whole elset hight
-    q_ep_r=ep_r/ h_w  #[N/mm2]
+    q_ep_r=R_tot/ h_w  #[N/mm2]
 
     # verbalise
     if verbalise:
@@ -163,8 +222,12 @@ def earthPressure_liveload_generator(structure, s, h_w, t_p, phi_k,gamma_Q=1, ve
     # Calculate magnitude and add area load
     #-------------------------------------------------------
     # calculate magnitude of area load
-    q = 52 #[N/mm2] #TODO check where this value comes from and weather it has to be varied
-    Ko = 1-m.sin(phi_k)
+    q = 0.052 #[N/mm2] = 52[kN/m2] From PAIngB B1.3 Page 72 (SBB specific norm)
+    # z = 700 [mm] #From PAIngB B1.3 Page 72
+    #TODO checken ob das so richtig ist mit dem If sentence (vgl bericht Hero)
+    # if h_g > z:
+    #     z=h_g
+    Ko = 1-m.sin(m.radians(phi_k))
     ep = gamma_Q*(Ko * q) #[N/mm2]
 
     # determine which elements are loaded
