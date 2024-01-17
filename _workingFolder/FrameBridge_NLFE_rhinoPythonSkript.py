@@ -349,27 +349,31 @@ for i in range(start,end+1):
     #### Superimposed Dead Load
     # Load of Gravel layer
     
-    #Staendigen lasten
-    earthPressure_gravel_generator(mdl, layers_deck, h_G, gamma_E, phi_k, gamma_G=1.35)
+    ##Staendigen lasten
+    earthPressure_gravel_generator(structure=mdl, elements=layers_deck, h_G=h_G, gamma_E=gamma_E, phi_k=phi_k, gamma_G=1.35)
     
     
     # Earth pressure Load generator (characteristic) on Wall 1 and 2
-    earth_pressure_backfill_load = earthPressure_backfill_generator(mdl, layers_walls, h_w, t_p, h_G, gamma_E, phi_k, gamma_G=1.35 ) #[N/mm2]
+    earth_pressure_backfill_load = earthPressure_backfill_generator(structure=mdl, elements=layers_walls, h_w=h_w, t_p=t_p, 
+                                                                    h_G=h_G, gamma_E=gamma_E, phi_k=phi_k, gamma_G=1.35 )  #[N/mm2]
 
-    #### Live Loads
+    ## Live Loads
     # TODO: iterate over ya! to calculate multiple load positions
     #Normalspurverkehr Load generator 
     # h_Pl here die normale platte hoehe/ thickness, ohne voute - read from sampled parameter
+    y_A_Biegung=(L_el/2) #-(m.cos(m.radians(beta))*1500)
     NSV_load_names=Normalspurbahnverkehr_load_generator(mdl,name='Gleis1', l_Pl=L_el, h_Pl=t_p, s=s*b1, beta=beta,
-                                                         q_Gl=q_Gl, b_Bs=b_Bs, h_Strich=h_G, Q_k=Q_k, y_A=2000,
-                                                         gamma_G=1.35, gamma_Q=1.45, m=4650 )
-    
+                                                         q_Gl=q_Gl, b_Bs=b_Bs, h_Strich=h_G,h_GL=160, h_w=h_w, Q_k=Q_k, y_A=y_A_Biegung,m=4650,
+                                                         gamma_G=1.35, gamma_Q=1.45, verbalise=True)
+                                                         
+    print(NSV_load_names)
     NSV_dead_loads=[NSV_load_names[0]]
     NSV_live_loads=NSV_load_names[1:]
 
     
     # Earth pressure load generator (resulting from live load) on wall 1 (only one sided)
-    earth_pressure_liveload = earthPressure_liveload_generator(mdl, s*b1, h_w, t_p, phi_k, gamma_Q=1.45)
+    earth_pressure_liveload = earthPressure_liveload_generator(structure=mdl, s=s*b1, h_w=h_w, t_p=t_p, phi_k=phi_k, gamma_Q=1.45)
+    # TODO wo die 1.45 stehen? in der welcher Norm -Notieren!
 
     
 
@@ -395,7 +399,7 @@ for i in range(start,end+1):
     # Run analyses
     # ------------------------------------------------------------------------------
     # ------------------------------------------------------------------------------
-    mdl.analyse_and_extract(software='ansys_sel', fields=[ 'u','eps','sig_sr' ], lstep = ['step_3'])  #'sf', 's'
+    #mdl.analyse_and_extract(software='ansys_sel', fields=[ 'u','eps','sig_sr' ], lstep = ['step_3'])  #'sf', 's'
 #    
 #    
 #    print('Analysis Finished')

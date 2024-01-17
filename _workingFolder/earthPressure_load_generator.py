@@ -116,17 +116,16 @@ def earthPressure_backfill_generator(structure, elements, h_w, t_p, h_G, gamma_E
 
     # celculate earth pressure
     # at top of slab deck (for the sqare of the earth pressure)
-    h_ep_o=h_G #[mm]
-    p_t = Ko * gamma_E * h_ep_o #[N/mm2]
+    p_t = Ko * gamma_E * h_G #[N/mm2]
 
     # at foundation hight (for the triangle of the force pressure)
     p_f = Ko * gamma_E * h_ep #[N/mm2] 
 
 
     # calculate resulting force  (area of earth pressure)
-    R_sqare=gamma_G* p_t * h_ep 
-    R_triangle = gamma_G*1/2 *p_f * h_ep
-    R_tot=R_sqare+R_triangle
+    R_sqare=gamma_G* p_t * h_ep  #[N/mm] 
+    R_triangle = gamma_G*1/2 *p_f * h_ep #[N/mm] 
+    R_tot=R_sqare+R_triangle #[N/mm] 
 
 
     # dirtribute uniformily on whole elset hight
@@ -134,7 +133,7 @@ def earthPressure_backfill_generator(structure, elements, h_w, t_p, h_G, gamma_E
 
     # verbalise
     if verbalise:
-        print('The earth pressure resulting from the backfill is calculated to be: ', q_ep_r, ' N/mm2 ;',q_ep_r*1000, ' kN/m2'  )
+        print('The earth pressure resulting from the backfill is calculated to be: ', q_ep_r, ' N/mm2 ;',q_ep_r*1000, ' kN/m2' )
 
     structure.add(AreaLoad(name='earthPressure_backfill', elements=elements, x=0,y=-q_ep_r,z=0, axes ='local')) 
 
@@ -171,6 +170,7 @@ def earthPressure_liveload_generator(structure, s, h_w, t_p, phi_k,gamma_Q=1, ve
 
     Limitations/Specification
     -------------
+    - So far the earth pressure live load is only applied to one side (at x=0), so far this function is not able to apply earth pressure on both wall sides
     - Has to be used after the the Normalspurbahnverkehr_load_generator function was executed (as this function uses the created Mittelachse)
     # TODO if Mittelachse noch nicht exist create one, coder von Normalspur function hier einfuegen?
     '''
@@ -198,7 +198,7 @@ def earthPressure_liveload_generator(structure, s, h_w, t_p, phi_k,gamma_Q=1, ve
 
     #calculation of corner point coordinates in wall 1
     # y is always 0
-    ep_width=3800 #[mm] #TODO why 3800, not 3000, should be varied?, or maybe gesamte b_GL_strich laenge aus Normal...function nehmen?
+    ep_width=3800 #[mm] # From PAIngB B1.3 Page 72 (SBB specific norm)
     x_A= point_start_x +ep_width/2
     z_A = -t_p
     x_B= point_start_x +ep_width/2
@@ -213,8 +213,8 @@ def earthPressure_liveload_generator(structure, s, h_w, t_p, phi_k,gamma_Q=1, ve
 
 
     # calculate coordinates of corner points in wall 2
-    # TODO heisst "einsitig" check if it should be applid to wall 1 instead of wall 2
-    # TODO for oter side: select mittelachse (von Gleis aufbringung)
+    # TODO Erddruck infolge vertikaler Bahnverkehrslasten ist einseitig oder beidseitig des Rahmens anzunehmen. (laut PAIngB B1.3 Page 72)
+    # TODO bis jetzt nur einseitig aufgebracht (zweiseitig ist bis jetzt nicht moeglich mit dieser funktion)
 
 
 
@@ -228,21 +228,21 @@ def earthPressure_liveload_generator(structure, s, h_w, t_p, phi_k,gamma_Q=1, ve
     # if h_g > z:
     #     z=h_g
     Ko = 1-m.sin(m.radians(phi_k))
-    ep = gamma_Q*(Ko * q) #[N/mm2]
+    p = gamma_Q*(Ko * q) #[N/mm2]
 
     # determine which elements are loaded
     loaded_element_numbers=area_load_generator_elements(structure, layer_name)
 
     # add load
     load_name='earthPressure_liveLoad'
-    structure.add(AreaLoad(load_name, elements=loaded_element_numbers,x=0,y=-ep,z=0,axes ='local'))
+    structure.add(AreaLoad(load_name, elements=loaded_element_numbers,x=0,y=-p,z=0,axes ='local'))
 
     # set default layer back to active layer
     rs.CurrentLayer('Default')
 
     # verbalise
     if verbalise:
-        print('The earth pressure resulting from the live load is calculated to be: ', ep, ' N/mm2 ;',ep*1000, ' kN/m2'  )
+        print('The earth pressure resulting from the live load is calculated to be: ', p, ' N/mm2 ;',p*1000, ' kN/m2'  )
 
     #return of name of generated area load
     return [load_name]
