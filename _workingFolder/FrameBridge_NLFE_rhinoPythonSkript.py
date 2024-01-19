@@ -70,7 +70,7 @@ import math as m
 
 
 # define sampling iteration (= Batch number)
-idx_s = 1
+idx_s = 10
 ## Read current sampling index (idx_s)
 #file_path=folder+'\\00_Sampled\\\current_idx_s.csv'
 #idx_s = read_csv_to_dict(file_path)['idx_s'][0]
@@ -165,7 +165,13 @@ for i in range(start,end+1):
     
     
     # ---------Initialise---------------------
-    name = 'NLFE_CFB_{}_{}'.format(idx_s, ID)
+    if ID % 2 != 0:
+        n_name=1
+    else:
+        n_name=2
+        
+    
+    name = 'NLFE_CFB{}'.format(n_name)#_{}_{}'.format(idx_s, ID)
     path = 'C:\Temp\\'
     mdl = Structure(name=name, path=path)
 
@@ -366,7 +372,7 @@ for i in range(start,end+1):
                                                          q_Gl=q_Gl, b_Bs=b_Bs, h_Strich=h_G,h_GL=160, h_w=h_w, Q_k=Q_k, y_A=y_A_Biegung,m=4650,
                                                          gamma_G=1.35, gamma_Q=1.45, verbalise=True)
                                                          
-    print(NSV_load_names)
+                                                         
     NSV_dead_loads=[NSV_load_names[0]]
     NSV_live_loads=NSV_load_names[1:]
 
@@ -399,16 +405,16 @@ for i in range(start,end+1):
     # Run analyses
     # ------------------------------------------------------------------------------
     # ------------------------------------------------------------------------------
-    #mdl.analyse_and_extract(software='ansys_sel', fields=[ 'u','eps','sig_sr' ], lstep = ['step_3'])  #'sf', 's'
-#    
-#    
+    mdl.analyse_and_extract(software='ansys_sel', fields=[ 'u','eps','sig_sr' ], lstep = ['step_3'])  #'sf', 's'
+    
+    
 #    print('Analysis Finished')
     # # Plot Results
     # # ------------------------------------------------------------------------------
     # # ------------------------------------------------------------------------------
     
-    # Plot Results for step_2
-#    rhino.plot_data(mdl, lstep='step_2', field='uz', cbar_size=1, source='CMMUsermat')
+    #Plot Results for step_3
+    rhino.plot_data(mdl, lstep='step_3', field='uz', cbar_size=1, source='CMMUsermat')
 #    rhino.plot_principal_stresses(mdl, step='step_2', shell_layer='top', scale=10**2)
 #    rhino.plot_principal_stresses(mdl, step='step_2', shell_layer='bot', scale=10**2)
 #    rhino.plot_data(mdl, lstep='step_2', field='sf1', cbar_size=1, source='CMMUsermat')

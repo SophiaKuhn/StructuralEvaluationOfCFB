@@ -377,7 +377,7 @@ def Normalspurbahnverkehr_load_generator(mdl, name=None, l_Pl=None, h_Pl=None, s
                 # print('q_k_Bl',q_k_Bl)
 
                 # Hinzufugen der belasten Elemente zu Struktur                
-                mdl.add(AreaLoad(Bahnlasten_Lasteinzug, elements=loaded_element_numbers,x=0,y=0,z=-q_d_Bl)) # Add new element set
+                mdl.add(AreaLoad(Bahnlasten_Lasteinzug, elements=loaded_element_numbers,x=0,y=0,z=-q_d_Bl, axes='global')) # Add new element set
 
                 # Warnung, das alle vorgegeben lastblocke durchlaufen wurden und eventuell noch mehr auf der Platte platz hatten
                 if L_i == L_i_list[List_lengh-1]:
