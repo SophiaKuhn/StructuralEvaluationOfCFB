@@ -70,7 +70,7 @@ import math as m
 
 
 # define sampling iteration (= Batch number)
-idx_s = 10
+idx_s = 200
 ## Read current sampling index (idx_s)
 #file_path=folder+'\\00_Sampled\\\current_idx_s.csv'
 #idx_s = read_csv_to_dict(file_path)['idx_s'][0]
@@ -94,9 +94,10 @@ print('n_samples: ',n_samples)
 
 #---------------------------------------------------------------------------------------
 #--------------iterate through the generated samples------------------------------------
-#---------------------------------------------------------------------------------------
-start = 0
-end = 0#n_samples
+#-------------
+#--------------------------------------------------------------------------
+start = 151
+end = 300#n_samples
 for i in range(start,end+1):
     
             
@@ -165,13 +166,23 @@ for i in range(start,end+1):
     
     
     # ---------Initialise---------------------
-    if ID % 2 != 0:
-        n_name=1
-    else:
+    if ID % 6 == 0:
+        n_name=6
+    elif ID % 5 == 0:
+        n_name=5
+    elif ID % 4 == 0:
+        n_name=4
+    elif ID % 3 == 0:
+        n_name=3
+    elif ID % 2 == 0:
         n_name=2
+    else:
+        n_name=1
+        
         
     
     name = 'NLFE_CFB{}'.format(n_name)#_{}_{}'.format(idx_s, ID)
+    print('Analysis File Name: ',name)
     path = 'C:\Temp\\'
     mdl = Structure(name=name, path=path)
 
@@ -348,7 +359,8 @@ for i in range(start,end+1):
     # ------------------------------------------------------------------------------
     
     #### Gravity Loads
-    mdl.add(GravityLoad(name='load_gravity',  x=0.0,  y=0.0,  z=1.0, elements=layers_shell ))
+    # TODO: gamma_G noch rein tun!!! Vorzeichen kontrollieren?
+    mdl.add(GravityLoad(name='load_gravity',  x=0.0,  y=0.0,  z=1.35, elements=layers_shell ))
     
     
     
@@ -356,7 +368,7 @@ for i in range(start,end+1):
     # Load of Gravel layer
     
     ##Staendigen lasten
-    earthPressure_gravel_generator(structure=mdl, elements=layers_deck, h_G=h_G, gamma_E=gamma_E, phi_k=phi_k, gamma_G=1.35)
+    earth_pressure_gravel_load=earthPressure_gravel_generator(structure=mdl, elements=layers_deck, h_G=h_G, gamma_E=gamma_E, phi_k=phi_k, gamma_G=1.35)
     
     
     # Earth pressure Load generator (characteristic) on Wall 1 and 2
@@ -384,19 +396,26 @@ for i in range(start,end+1):
     
 
     #Steps
-  
-    dead_loads = ['load_gravity']+ earth_pressure_backfill_load + NSV_dead_loads #+gravel_pressure 
+    dead_loads=['load_gravity']
+    superimposed_dead_loads = earth_pressure_gravel_load+ earth_pressure_backfill_load + NSV_dead_loads #+gravel_pressure 
     live_loads = NSV_live_loads +earth_pressure_liveload
     
-    #missing: dead load vom Gleis + schwelle (trennen der Loadings function), + dead load from gravel layer
+
     
+    
+#    mdl.add([
+#    GeneralStep(name='step_1',  displacements=[ 'nset_pinned_set_disp_1', 'nset_pinned_set_disp_2'] ,  nlgeom=False),
+#    GeneralStep(name='step_2',  loads=earth_pressure_liveload ,   nlgeom=False, increments=1),
+#    ])
+#    mdl.steps_order = ['step_1','step_2']
     
     mdl.add([
     GeneralStep(name='step_1',  displacements=[ 'nset_pinned_set_disp_1', 'nset_pinned_set_disp_2'] ,  nlgeom=False),
     GeneralStep(name='step_2',  loads=dead_loads ,   nlgeom=False, increments=1),
-    GeneralStep(name='step_3',  loads=live_loads ,   nlgeom=False, increments=1)
+    GeneralStep(name='step_3',  loads=superimposed_dead_loads ,   nlgeom=False, increments=1),
+    GeneralStep(name='step_4',  loads=live_loads ,   nlgeom=False, increments=1)
     ])
-    mdl.steps_order = ['step_1','step_2', 'step_3']
+    mdl.steps_order = ['step_1','step_2', 'step_3', 'step_4']
 
 
 
@@ -405,7 +424,7 @@ for i in range(start,end+1):
     # Run analyses
     # ------------------------------------------------------------------------------
     # ------------------------------------------------------------------------------
-    mdl.analyse_and_extract(software='ansys_sel', fields=[ 'u','eps','sig_sr' ], lstep = ['step_3'])  #'sf', 's'
+    mdl.analyse_and_extract(software='ansys_sel', fields=[ 'u','eps','sig_sr'], lstep = ['step_4'])  #'sf', 's'
     
     
 #    print('Analysis Finished')
@@ -414,18 +433,29 @@ for i in range(start,end+1):
     # # ------------------------------------------------------------------------------
     
     #Plot Results for step_3
-    rhino.plot_data(mdl, lstep='step_3', field='uz', cbar_size=1, source='CMMUsermat')
+#    rhino.plot_data(mdl, lstep='step_2', field='uz', cbar_size=1,scale=2000.0, source='CMMUsermat')
+#    rhino.plot_data(mdl, lstep='step_2', field='ux', cbar_size=1, scale=2000.0,source='CMMUsermat')
+#    rhino.plot_data(mdl, lstep='step_2', field='uy', cbar_size=1, scale=2000.0, source='CMMUsermat')
+#    
+#    rhino.plot_data(mdl, lstep='step_3', field='uz', cbar_size=1,scale=2000.0, source='CMMUsermat')
+#    rhino.plot_data(mdl, lstep='step_3', field='ux', cbar_size=1, scale=2000.0,source='CMMUsermat')
+#    rhino.plot_data(mdl, lstep='step_3', field='uy', cbar_size=1, scale=2000.0, source='CMMUsermat')
+#    
+#    rhino.plot_data(mdl, lstep='step_4', field='uz', cbar_size=1,scale=2000.0, source='CMMUsermat')
+#    rhino.plot_data(mdl, lstep='step_4', field='ux', cbar_size=1, scale=2000.0,source='CMMUsermat')
+#    rhino.plot_data(mdl, lstep='step_4', field='uy', cbar_size=1, scale=2000.0, source='CMMUsermat')
+
 #    rhino.plot_principal_stresses(mdl, step='step_2', shell_layer='top', scale=10**2)
 #    rhino.plot_principal_stresses(mdl, step='step_2', shell_layer='bot', scale=10**2)
-#    rhino.plot_data(mdl, lstep='step_2', field='sf1', cbar_size=1, source='CMMUsermat')
-#    rhino.plot_data(mdl, lstep='step_2', field='sf2', cbar_size=1, source='CMMUsermat')
-#    rhino.plot_data(mdl, lstep='step_2', field='sf3', cbar_size=1, source='CMMUsermat')
-#    rhino.plot_data(mdl, lstep='step_2', field='sf4', cbar_size=1, source='CMMUsermat')
-#    rhino.plot_data(mdl, lstep='step_2', field='sf5', cbar_size=1, source='CMMUsermat')
-#    rhino.plot_data(mdl, lstep='step_2', field='sm1', cbar_size=1, source='CMMUsermat')
-#    rhino.plot_data(mdl, lstep='step_2', field='sm2', cbar_size=1, source='CMMUsermat')
-#    rhino.plot_data(mdl, lstep='step_2', field='sm2', cbar_size=1, source='CMMUsermat')
-#    rhino.plot_data(mdl, lstep='step_2', field='sm3', cbar_size=1, source='CMMUsermat')
+#    rhino.plot_data(mdl, lstep='step_3', field='sf1', cbar_size=1, source='CMMUsermat')
+#    rhino.plot_data(mdl, lstep='step_3', field='sf2', cbar_size=1, source='CMMUsermat')
+#    rhino.plot_data(mdl, lstep='step_3', field='sf3', cbar_size=1, source='CMMUsermat')
+#    rhino.plot_data(mdl, lstep='step_3', field='sf4', cbar_size=1, source='CMMUsermat')
+#    rhino.plot_data(mdl, lstep='step_3', field='sf5', cbar_size=1, source='CMMUsermat')
+#    rhino.plot_data(mdl, lstep='step_3', field='sm1', cbar_size=1, source='CMMUsermat')
+#    rhino.plot_data(mdl, lstep='step_3', field='sm2', cbar_size=1, source='CMMUsermat')
+#    rhino.plot_data(mdl, lstep='step_3', field='sm2', cbar_size=1, source='CMMUsermat')
+#    rhino.plot_data(mdl, lstep='step_3', field='sm3', cbar_size=1, source='CMMUsermat')
 
     
     

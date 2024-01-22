@@ -57,7 +57,7 @@ def earthPressure_gravel_generator(structure, elements,h_G, gamma_E, phi_k, gamm
         print('The earth pressure resulting from the gravel layer is calculated to be: ', p, ' N/mm2 ;',p*1000, ' kN/m2'  )
 
     #add load to structur object
-    structure.add(AreaLoad(name='earthPressure_gravel', elements=elements, x=0,y=0,z=-p, axes ='local')) 
+    structure.add(AreaLoad(name='earthPressure_gravel', elements=elements, x=0,y=0,z=p, axes ='global')) #postive z direction means downwards here 
 
     #return the name of the load that was saved to the structure object
     return ['earthPressure_gravel']
@@ -135,7 +135,7 @@ def earthPressure_backfill_generator(structure, elements, h_w, t_p, h_G, gamma_E
     if verbalise:
         print('The earth pressure resulting from the backfill is calculated to be: ', q_ep_r, ' N/mm2 ;',q_ep_r*1000, ' kN/m2' )
 
-    structure.add(AreaLoad(name='earthPressure_backfill', elements=elements, x=0,y=-q_ep_r,z=0, axes ='local')) 
+    structure.add(AreaLoad(name='earthPressure_backfill', elements=elements, x=0,y=0,z=q_ep_r, axes ='local')) # postive z-dir is inwards here
 
     # return q_er_r 
     return ['earthPressure_backfill']
@@ -235,7 +235,7 @@ def earthPressure_liveload_generator(structure, s, h_w, t_p, phi_k,gamma_Q=1, ve
 
     # add load
     load_name='earthPressure_liveLoad'
-    structure.add(AreaLoad(load_name, elements=loaded_element_numbers,x=0,y=-p,z=0,axes ='local'))
+    structure.add(AreaLoad(load_name, elements=loaded_element_numbers,x=0,y=0,z=p,axes ='local')) # postive z-dir is inwards here
 
     # set default layer back to active layer
     rs.CurrentLayer('Default')

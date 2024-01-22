@@ -176,7 +176,7 @@ def Normalspurbahnverkehr_load_generator(mdl, name=None, l_Pl=None, h_Pl=None, s
     loaded_element_numbers=area_load_generator_elements(mdl,Gleis_Eigengewichte_Schiene) # Calculate Element numbers within the area load curve
     
     # Hinzufugen der belasteten Elemente
-    mdl.add(AreaLoad(Gleis_Eigengewichte_Schiene, elements=loaded_element_numbers,x=0,y=0,z=-q_k_Gl, axes ='global')) # Add new element set
+    mdl.add(AreaLoad(Gleis_Eigengewichte_Schiene, elements=loaded_element_numbers,x=0,y=0,z=q_k_Gl, axes ='global')) # Add new element set
 
     # Hinzufugen des Namens des Layers der Lasteinzugsflache
     # Bemerkung: Naming _Lasteinzugsflaeche_der_Schienen_Eigengewichte' gibt es pro Schiene (d.h. pro Funktionsaufruf) nur einmal
@@ -193,7 +193,7 @@ def Normalspurbahnverkehr_load_generator(mdl, name=None, l_Pl=None, h_Pl=None, s
     b_Bl=b_Gl #Querrichtung
 
     #Berechnung Flachenlast
-    #Fur Hoechstgeschwindigkeit bis 140 #TODO adapt for other Hoechstgewschwindigkeiten
+    #Fur Hoechstgeschwindigkeit bis 140 #TODO adapt for other Hoechstgewschwindigkeiten 125
     l_phi=(1.3*(l_Pl+(h_w+h_Pl/2)*2))/3 #[mm]
     l_phi_list=[1,2,4,6,8,10,15,20,25,30,40,50,60,70,80,100] #[m]
     dynF_list=[1.60, 1.59, 1.57, 1.54, 1.50, 1.45, 1.35, 1.32, 1.29, 1.26, 1.23, 1.20, 1.18, 1.17, 1.16, 1.14]
@@ -377,7 +377,7 @@ def Normalspurbahnverkehr_load_generator(mdl, name=None, l_Pl=None, h_Pl=None, s
                 # print('q_k_Bl',q_k_Bl)
 
                 # Hinzufugen der belasten Elemente zu Struktur                
-                mdl.add(AreaLoad(Bahnlasten_Lasteinzug, elements=loaded_element_numbers,x=0,y=0,z=-q_d_Bl, axes='global')) # Add new element set
+                mdl.add(AreaLoad(Bahnlasten_Lasteinzug, elements=loaded_element_numbers,x=0,y=0,z=q_d_Bl, axes='global')) # postive z direction is downwards
 
                 # Warnung, das alle vorgegeben lastblocke durchlaufen wurden und eventuell noch mehr auf der Platte platz hatten
                 if L_i == L_i_list[List_lengh-1]:
