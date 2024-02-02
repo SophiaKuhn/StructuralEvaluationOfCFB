@@ -70,7 +70,7 @@ import math as m
 
 
 # define sampling iteration (= Batch number)
-idx_s = 200
+idx_s = 1
 ## Read current sampling index (idx_s)
 #file_path=folder+'\\00_Sampled\\\current_idx_s.csv'
 #idx_s = read_csv_to_dict(file_path)['idx_s'][0]
@@ -96,8 +96,8 @@ print('n_samples: ',n_samples)
 #--------------iterate through the generated samples------------------------------------
 #-------------
 #--------------------------------------------------------------------------
-start = 151
-end = 300#n_samples
+start = 0
+end = 0#n_samples
 for i in range(start,end+1):
     
             
@@ -424,7 +424,7 @@ for i in range(start,end+1):
     # Run analyses
     # ------------------------------------------------------------------------------
     # ------------------------------------------------------------------------------
-    mdl.analyse_and_extract(software='ansys_sel', fields=[ 'u','eps','sig_sr'], lstep = ['step_4'])  #'sf', 's'
+    mdl.analyse_and_extract(software='ansys_sel', fields=[ 'u','eps','sig_sr', 'sf', 's'], lstep = ['step_4'])  #'sf', 's'
     
     
 #    print('Analysis Finished')
@@ -433,9 +433,9 @@ for i in range(start,end+1):
     # # ------------------------------------------------------------------------------
     
     #Plot Results for step_3
-#    rhino.plot_data(mdl, lstep='step_2', field='uz', cbar_size=1,scale=2000.0, source='CMMUsermat')
-#    rhino.plot_data(mdl, lstep='step_2', field='ux', cbar_size=1, scale=2000.0,source='CMMUsermat')
-#    rhino.plot_data(mdl, lstep='step_2', field='uy', cbar_size=1, scale=2000.0, source='CMMUsermat')
+    rhino.plot_data(mdl, lstep='step_4', field='uz', cbar_size=1,scale=300.0, source='CMMUsermat')
+    rhino.plot_data(mdl, lstep='step_4', field='ux', cbar_size=1, scale=300.0,source='CMMUsermat')
+    rhino.plot_data(mdl, lstep='step_4', field='uy', cbar_size=1, scale=300.0, source='CMMUsermat')
 #    
 #    rhino.plot_data(mdl, lstep='step_3', field='uz', cbar_size=1,scale=2000.0, source='CMMUsermat')
 #    rhino.plot_data(mdl, lstep='step_3', field='ux', cbar_size=1, scale=2000.0,source='CMMUsermat')
@@ -445,17 +445,17 @@ for i in range(start,end+1):
 #    rhino.plot_data(mdl, lstep='step_4', field='ux', cbar_size=1, scale=2000.0,source='CMMUsermat')
 #    rhino.plot_data(mdl, lstep='step_4', field='uy', cbar_size=1, scale=2000.0, source='CMMUsermat')
 
-#    rhino.plot_principal_stresses(mdl, step='step_2', shell_layer='top', scale=10**2)
-#    rhino.plot_principal_stresses(mdl, step='step_2', shell_layer='bot', scale=10**2)
-#    rhino.plot_data(mdl, lstep='step_3', field='sf1', cbar_size=1, source='CMMUsermat')
-#    rhino.plot_data(mdl, lstep='step_3', field='sf2', cbar_size=1, source='CMMUsermat')
-#    rhino.plot_data(mdl, lstep='step_3', field='sf3', cbar_size=1, source='CMMUsermat')
-#    rhino.plot_data(mdl, lstep='step_3', field='sf4', cbar_size=1, source='CMMUsermat')
-#    rhino.plot_data(mdl, lstep='step_3', field='sf5', cbar_size=1, source='CMMUsermat')
-#    rhino.plot_data(mdl, lstep='step_3', field='sm1', cbar_size=1, source='CMMUsermat')
-#    rhino.plot_data(mdl, lstep='step_3', field='sm2', cbar_size=1, source='CMMUsermat')
-#    rhino.plot_data(mdl, lstep='step_3', field='sm2', cbar_size=1, source='CMMUsermat')
-#    rhino.plot_data(mdl, lstep='step_3', field='sm3', cbar_size=1, source='CMMUsermat')
+    rhino.plot_principal_stresses(mdl, step='step_4', shell_layer='top', scale=10**2)
+    rhino.plot_principal_stresses(mdl, step='step_4', shell_layer='bot', scale=10**2)
+    rhino.plot_data(mdl, lstep='step_4', field='sf1', cbar_size=1, source='CMMUsermat')
+    rhino.plot_data(mdl, lstep='step_4', field='sf2', cbar_size=1, source='CMMUsermat')
+    rhino.plot_data(mdl, lstep='step_4', field='sf3', cbar_size=1, source='CMMUsermat')
+    rhino.plot_data(mdl, lstep='step_4', field='sf4', cbar_size=1, source='CMMUsermat')
+    rhino.plot_data(mdl, lstep='step_4', field='sf5', cbar_size=1, source='CMMUsermat')
+    rhino.plot_data(mdl, lstep='step_4', field='sm1', cbar_size=1, source='CMMUsermat')
+    rhino.plot_data(mdl, lstep='step_4', field='sm2', cbar_size=1, source='CMMUsermat')
+    rhino.plot_data(mdl, lstep='step_4', field='sm2', cbar_size=1, source='CMMUsermat')
+    rhino.plot_data(mdl, lstep='step_4', field='sm3', cbar_size=1, source='CMMUsermat')
 
     
     
