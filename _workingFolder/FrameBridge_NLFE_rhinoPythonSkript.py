@@ -70,7 +70,7 @@ import math as m
 
 
 # define sampling iteration (= Batch number)
-idx_s = 520
+idx_s = 510
 ## Read current sampling index (idx_s)
 #file_path=folder+'\\00_Sampled\\\current_idx_s.csv'
 #idx_s = read_csv_to_dict(file_path)['idx_s'][0]
@@ -97,7 +97,7 @@ print('n_samples: ',n_samples)
 #-------------
 #--------------------------------------------------------------------------
 start = 0
-end = 19#n_samples
+end = 0#n_samples
 for i in range(start,end+1):
     
             
