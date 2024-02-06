@@ -96,8 +96,8 @@ print('n_samples: ',n_samples)
 #--------------iterate through the generated samples------------------------------------
 #-------------
 #--------------------------------------------------------------------------
-start = 1
-end = 19#n_samples
+start = 12
+end = 12#n_samples
 for i in range(start,end+1):
     
             
