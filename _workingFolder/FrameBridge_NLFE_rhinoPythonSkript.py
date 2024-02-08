@@ -70,7 +70,7 @@ import math as m
 
 
 # define sampling iteration (= Batch number)
-idx_s = 540
+idx_s = 200
 ## Read current sampling index (idx_s)
 #file_path=folder+'\\00_Sampled\\\current_idx_s.csv'
 #idx_s = read_csv_to_dict(file_path)['idx_s'][0]
@@ -96,8 +96,8 @@ print('n_samples: ',n_samples)
 #--------------iterate through the generated samples------------------------------------
 #-------------
 #--------------------------------------------------------------------------
-start = 15
-end = 19#n_samples
+start = 919
+end = 999 #n_samples
 for i in range(start,end+1):
     
             
@@ -166,6 +166,12 @@ for i in range(start,end+1):
     
     
     # ---------Initialise---------------------
+    if ID % 9== 0:
+        n_name=9
+    if ID % 8== 0:
+        n_name=8
+    if ID % 7 == 0:
+        n_name=7
     if ID % 6 == 0:
         n_name=6
     elif ID % 5 == 0:
