@@ -96,8 +96,8 @@ print('n_samples: ',n_samples)
 #--------------iterate through the generated samples------------------------------------
 #-------------
 #--------------------------------------------------------------------------
-start = 919
-end = 999 #n_samples
+start = 193
+end = 194 #n_samples
 for i in range(start,end+1):
     
             
@@ -472,7 +472,6 @@ for i in range(start,end+1):
         os.makedirs(subfolder_path)
   
     #save structure to a pickle file
-    # ATTENTION ich habe das gefuehl, wenn das file schon existiert dann ueberschreibt es das nicht!!S
     save_to_pickle(obj=mdl, ID=ID, idx_s=idx_s, folder_path=subfolder_path, name='structure')
     
     
