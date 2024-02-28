@@ -560,7 +560,7 @@ loc coor
             raise NotImplementedError
 
 
-    def analyse(self, software, exe=None, cpus=4, license='research', delete=True, output=True):
+    def analyse(self, software, exe=None, cpus=4, license='research', delete=True, output=True, error_found=False):
         """Runs the analysis through the chosen FEA software / library.
 
         Parameters
@@ -587,13 +587,15 @@ loc coor
 
         if software == 'ansys_sel':
             cpus = 1 if license == 'student' else cpus
-            ansys_sel.launch_process(self, exe=exe, cpus=cpus, output=output)            
+            error_found=ansys_sel.launch_process(self, exe=exe, cpus=cpus, output=output)            
 
         else:
             raise NotImplementedError
         
+        return error_found
+        
     def extract_data(self, software, fields='u', steps='all', exe=None, sets=None, license='research', output=True,
-                     return_data=True, components=None):
+                     return_data=True, components=None, error_found=False):
         """Extracts data from the analysis output files.
 
         Parameters
@@ -626,7 +628,7 @@ loc coor
 
         if software == 'ansys_sel':
             ansys_sel.extract_data(self, fields=fields, exe=exe, output=output, return_data=return_data,
-                              components=components)                              
+                              components=components, error_found=error_found)                              
 
         else:
             raise NotImplementedError
@@ -666,10 +668,10 @@ loc coor
 
         self.write_input_file(software=software, fields=fields, output=output, save=save, ndof=ndof, lstep=lstep, sbstep=sbstep)
 
-        self.analyse(software=software, exe=exe, cpus=cpus, license=license, output=output)
-
+        error_found=self.analyse(software=software, exe=exe, cpus=cpus, license=license, output=output)
+        print('Error was found:', error_found)
         self.extract_data(software=software, fields=fields, exe=exe, license=license, output=output,
-                          return_data=return_data, components=components)
+                          return_data=return_data, components=components, error_found=error_found)
 
     # ==============================================================================
     # Results
