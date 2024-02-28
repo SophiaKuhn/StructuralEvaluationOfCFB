@@ -97,7 +97,7 @@ print('n_samples: ',n_samples)
 #-------------
 #--------------------------------------------------------------------------
 start = 0
-end = 0#n_samples
+end = 0 #n_samples
 for i in range(start,end+1):
     
             
@@ -166,7 +166,13 @@ for i in range(start,end+1):
     
     
     # ---------Initialise---------------------
-    if ID % 6 == 0:
+    if ID % 9== 0:
+        n_name=9
+    elif ID % 8== 0:
+        n_name=8
+    elif ID % 7 == 0:
+        n_name=7
+    elif ID % 6 == 0:
         n_name=6
     elif ID % 5 == 0:
         n_name=5
@@ -341,9 +347,9 @@ for i in range(start,end+1):
     
     
 ##   Grafical plots 
-#    plot_loc_axes(mdl, axes_scale=50) # Plot Local coordinates 
-#    plot_nr_elem(mdl) # Plot Element Numbers
-#    plot_nr_nodes(mdl)  # Plot Node Numbers
+    plot_loc_axes(mdl, axes_scale=50) # Plot Local coordinates 
+    plot_nr_elem(mdl) # Plot Element Numbers
+    plot_nr_nodes(mdl)  # Plot Node Numbers
    
     
     #-------------- Constrains (Displacements)---------------
@@ -421,71 +427,70 @@ for i in range(start,end+1):
 
 
    
-    # Run analyses
-    # ------------------------------------------------------------------------------
-    # ------------------------------------------------------------------------------
-    mdl.analyse_and_extract(software='ansys_sel', fields=[ 'u','eps','sig_sr', 'sf', 's'], lstep = ['step_4'])  #'sf', 's'
-    
-    
-#    print('Analysis Finished')
-    # # Plot Results
-    # # ------------------------------------------------------------------------------
-    # # ------------------------------------------------------------------------------
-    
-    #Plot Results for step_3
-    rhino.plot_data(mdl, lstep='step_4', field='uz', cbar_size=1,scale=300.0, source='CMMUsermat')
-    rhino.plot_data(mdl, lstep='step_4', field='ux', cbar_size=1, scale=300.0,source='CMMUsermat')
-    rhino.plot_data(mdl, lstep='step_4', field='uy', cbar_size=1, scale=300.0, source='CMMUsermat')
+#    # Run analyses
+#    # ------------------------------------------------------------------------------
+#    # ------------------------------------------------------------------------------
+#    mdl.analyse_and_extract(software='ansys_sel', fields=[ 'u','eps','sig_sr', 'sf', 's'], lstep = ['step_4'])  #'sf', 's'
 #    
-#    rhino.plot_data(mdl, lstep='step_3', field='uz', cbar_size=1,scale=2000.0, source='CMMUsermat')
-#    rhino.plot_data(mdl, lstep='step_3', field='ux', cbar_size=1, scale=2000.0,source='CMMUsermat')
-#    rhino.plot_data(mdl, lstep='step_3', field='uy', cbar_size=1, scale=2000.0, source='CMMUsermat')
 #    
-#    rhino.plot_data(mdl, lstep='step_4', field='uz', cbar_size=1,scale=2000.0, source='CMMUsermat')
-#    rhino.plot_data(mdl, lstep='step_4', field='ux', cbar_size=1, scale=2000.0,source='CMMUsermat')
-#    rhino.plot_data(mdl, lstep='step_4', field='uy', cbar_size=1, scale=2000.0, source='CMMUsermat')
-
-    rhino.plot_principal_stresses(mdl, step='step_4', shell_layer='top', scale=10**2)
-    rhino.plot_principal_stresses(mdl, step='step_4', shell_layer='bot', scale=10**2)
-    rhino.plot_data(mdl, lstep='step_4', field='sf1', cbar_size=1, source='CMMUsermat')
-    rhino.plot_data(mdl, lstep='step_4', field='sf2', cbar_size=1, source='CMMUsermat')
-    rhino.plot_data(mdl, lstep='step_4', field='sf3', cbar_size=1, source='CMMUsermat')
-    rhino.plot_data(mdl, lstep='step_4', field='sf4', cbar_size=1, source='CMMUsermat')
-    rhino.plot_data(mdl, lstep='step_4', field='sf5', cbar_size=1, source='CMMUsermat')
-    rhino.plot_data(mdl, lstep='step_4', field='sm1', cbar_size=1, source='CMMUsermat')
-    rhino.plot_data(mdl, lstep='step_4', field='sm2', cbar_size=1, source='CMMUsermat')
-    rhino.plot_data(mdl, lstep='step_4', field='sm2', cbar_size=1, source='CMMUsermat')
-    rhino.plot_data(mdl, lstep='step_4', field='sm3', cbar_size=1, source='CMMUsermat')
-
-    
-    
-    # --------------------------Save Analysis Results -----------------------------------
-    # Save the Rhino file
-    subfolder_path=folder_path+'\\{}_Batch\\{}_{}_CFB'.format(idx_s, idx_s, ID)
-    if not os.path.exists(subfolder_path):
-        os.makedirs(subfolder_path)
-  
-    #save structure to a pickle file
-    # ATTENTION ich habe das gefuehl, wenn das file schon existiert dann ueberschreibt es das nicht!!S
-    save_to_pickle(obj=mdl, ID=ID, idx_s=idx_s, folder_path=subfolder_path, name='structure')
-    
-    
-    
-    
-    # save results dict to a json file
-    res_dict=mdl.results
-    save_to_json(save_dict=res_dict,ID=ID,idx_s=idx_s,folder_path=subfolder_path,
-                    name='analysisResults')
-    
-
-   
-#    # save rhino file (with results)
-#    filePath=folder_path+'\\{}_{}_geo_analysis.3dm'.format(idx_s,ID)
-#    opt = r.FileIO.FileWriteOptions()
-#    doc = r.RhinoDoc.ActiveDoc
-#    doc.WriteFile(filePath,opt) #note: also saves DocUserText
-    
-    print('Files saved')
+##    print('Analysis Finished')
+#    # # Plot Results
+#    # # ------------------------------------------------------------------------------
+#    # # ------------------------------------------------------------------------------
+#    
+#    #Plot Results for step_3
+##    rhino.plot_data(mdl, lstep='step_4', field='uz', cbar_size=1,scale=300.0, source='CMMUsermat')
+##    rhino.plot_data(mdl, lstep='step_4', field='ux', cbar_size=1, scale=300.0,source='CMMUsermat')
+##    rhino.plot_data(mdl, lstep='step_4', field='uy', cbar_size=1, scale=300.0, source='CMMUsermat')
+##    
+##    rhino.plot_data(mdl, lstep='step_3', field='uz', cbar_size=1,scale=2000.0, source='CMMUsermat')
+##    rhino.plot_data(mdl, lstep='step_3', field='ux', cbar_size=1, scale=2000.0,source='CMMUsermat')
+##    rhino.plot_data(mdl, lstep='step_3', field='uy', cbar_size=1, scale=2000.0, source='CMMUsermat')
+##    
+##    rhino.plot_data(mdl, lstep='step_4', field='uz', cbar_size=1,scale=2000.0, source='CMMUsermat')
+##    rhino.plot_data(mdl, lstep='step_4', field='ux', cbar_size=1, scale=2000.0,source='CMMUsermat')
+##    rhino.plot_data(mdl, lstep='step_4', field='uy', cbar_size=1, scale=2000.0, source='CMMUsermat')
+#
+##    rhino.plot_principal_stresses(mdl, step='step_4', shell_layer='top', scale=10**2)
+##    rhino.plot_principal_stresses(mdl, step='step_4', shell_layer='bot', scale=10**2)
+##    rhino.plot_data(mdl, lstep='step_4', field='sf1', cbar_size=1, source='CMMUsermat')
+##    rhino.plot_data(mdl, lstep='step_4', field='sf2', cbar_size=1, source='CMMUsermat')
+##    rhino.plot_data(mdl, lstep='step_4', field='sf3', cbar_size=1, source='CMMUsermat')
+##    rhino.plot_data(mdl, lstep='step_4', field='sf4', cbar_size=1, source='CMMUsermat')
+##    rhino.plot_data(mdl, lstep='step_4', field='sf5', cbar_size=1, source='CMMUsermat')
+##    rhino.plot_data(mdl, lstep='step_4', field='sm1', cbar_size=1, source='CMMUsermat')
+##    rhino.plot_data(mdl, lstep='step_4', field='sm2', cbar_size=1, source='CMMUsermat')
+##    rhino.plot_data(mdl, lstep='step_4', field='sm2', cbar_size=1, source='CMMUsermat')
+##    rhino.plot_data(mdl, lstep='step_4', field='sm3', cbar_size=1, source='CMMUsermat')
+#
+#    
+#    
+#    # --------------------------Save Analysis Results -----------------------------------
+#    # Save the Rhino file
+#    subfolder_path=folder_path+'\\{}_Batch\\{}_{}_CFB'.format(idx_s, idx_s, ID)
+#    if not os.path.exists(subfolder_path):
+#        os.makedirs(subfolder_path)
+#  
+#    #save structure to a pickle file
+#    save_to_pickle(obj=mdl, ID=ID, idx_s=idx_s, folder_path=subfolder_path, name='structure')
+#    
+#    
+#    
+#    
+#    # save results dict to a json file
+#    res_dict=mdl.results
+#    save_to_json(save_dict=res_dict,ID=ID,idx_s=idx_s,folder_path=subfolder_path,
+#                    name='analysisResults')
+#    
+#
+#   
+##    # save rhino file (with results)
+##    filePath=folder_path+'\\{}_{}_geo_analysis.3dm'.format(idx_s,ID)
+##    opt = r.FileIO.FileWriteOptions()
+##    doc = r.RhinoDoc.ActiveDoc
+##    doc.WriteFile(filePath,opt) #note: also saves DocUserText
+#    
+#    print('Files saved')
 
     
 
