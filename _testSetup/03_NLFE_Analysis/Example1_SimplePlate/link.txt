@@ -1,0 +1,2 @@
+Example is taken from: 
+https://github.com/StrucEng-Library-kfmresearch/strucenglib-snippets/tree/ansys/examples
