@@ -71,7 +71,7 @@ import math as m
 
 # define sampling iteration (= Batch number)
 #!!!!INPUT HERE!!!!!
-idx_s = 1000
+idx_s = 1
 
 
 
@@ -95,8 +95,8 @@ print('n_samples: ',n_samples)
 #-------------
 #--------------------------------------------------------------------------
 #!!!!INPUT HERE!!!!!
-start = 2
-end = 2#n_samples
+start = 0
+end = 0#n_samples
 for i in range(start,end+1):
     
             
@@ -191,8 +191,6 @@ for i in range(start,end+1):
     path = 'C:\Temp\\'
     mdl = Structure(name=name, path=path)
 
-    # Structure
-    mdl = Structure(name=name, path=path)
     
     
     #------------add sets from Rhino file --------------------
@@ -460,15 +458,15 @@ for i in range(start,end+1):
         os.makedirs(subfolder_path)
   
     #save structure to a pickle file
-    save_to_pickle(obj=mdl, ID=ID, idx_s=idx_s, folder_path=subfolder_path, name='structure')
-    
-    
+    file_name='{}_{}_structure.pkl'.format(idx_s,ID)
+    save_to_pickle(obj=mdl, folder_path=subfolder_path, file_name=file_name)
     
     
     # save results dict to a json file
     res_dict=mdl.results
-    save_to_json(save_dict=res_dict,ID=ID,idx_s=idx_s,folder_path=subfolder_path,
-                    name='analysisResults')
+    file_name='{}_{}_analysisResults.json'.format(idx_s,ID)
+    save_to_json(save_dict=res_dict,folder_path=subfolder_path,
+                    file_name=file_name)
     
 
    

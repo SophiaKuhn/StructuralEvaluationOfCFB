@@ -1,4 +1,4 @@
- # Author(s): Sophia Kuhn (ETH Zurich)
+ # Author(s): Sophia Kuhn (ETHZ)
 
 import os 
 import math as m

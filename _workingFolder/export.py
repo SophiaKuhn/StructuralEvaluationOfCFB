@@ -1,4 +1,4 @@
-# Author(s): Compas/Compas FEA Team, Marius  Weber (ETHZ, HSLU T&A)
+# Author(s): Sophia Kuhn (ETHZ)
 
 from __future__ import absolute_import
 from __future__ import division
@@ -89,158 +89,33 @@ def delete_all(exept_layer="Default"):
         print("All keys of DocumentUserText were deleated.")
 
 
-def save_to_pickle(obj, ID, idx_s, folder_path, name = 'unknown'):
+def save_to_pickle(obj, folder_path=None, file_name = 'unknown'):
 
     import pickle
     # construct path
-    filePath=folder_path+'\\{}_{}_{}.pkl'.format(idx_s,ID,name)
+    if folder_path == None:
+        filePath= file_name + '.pkl'
+    else:
+        filePath=folder_path + '\\'+file_name + '.pkl'
+
     # Save the object to a pickle file
     with open(filePath, "wb") as pickle_file:
         pickle.dump(obj, pickle_file)
 
-def save_to_json(save_dict,ID, idx_s, folder_path, name = 'unknown'):
+def save_to_json(save_dict,folder_path=None, file_name = 'unknown'):
     
     import json
     # construct path
-    filePath=folder_path+'\\{}_{}_{}.json'.format(idx_s,ID,name)
+    if folder_path == None:
+        filePath=file_name + '.json'
+    else:
+        filePath=folder_path + '\\'+file_name + '.json'
+
     # Save the dictionary to a JSON file
     with open(filePath, "w") as json_file:
         json.dump(save_dict, json_file)
         
 
-
-
-def export_results(structure,i, step):
-    
-    #exploring Nodes
-    nodes_dict=structure.nodes #gets dicts of all
-    #print('node_dict', nodes_dict )
-    node0=structure.nodes[0] #gets the 0. node
-    #print('single node object', node0 )
-    node0_x=[]
-    node0_y=[]
-    node0_z=[]
-    for n in nodes_dict.keys():
-        node0_x.append(structure.nodes[n].x) #gets the global x coordinate of node 0.
-        node0_y.append(structure.nodes[n].y)
-        node0_z.append(structure.nodes[n].z) 
-    #print('single node object x coordniate', node0_x )
-
-    nodesxyz=structure.nodes_xyz() #gets all global coordinates of all nodes of structure
-    #print('Printing xyz of all nodes',nodesxyz)
-
-    # exploring elements
-    elements = structure.elements
-    print('Elements',elements)
-    elementkeys = structure.elements.keys() 
-    print('Printing element keys',elementkeys)
-    element0 = structure.elements[0]
-    print('Single Element:', element0)
-    element0_property=structure.elements[0].element_property
-    print('Element property:', element0_property)
-
-
-    # exploring element_properties
-    el_props=structure. element_properties
-    print('All el. properties:', el_props)
-    el_prop0=structure. element_properties[element0_property]
-    print('el_prop0', el_prop0 )
-
-    #exploring results
-    results=structure.results #get all analysis results
-    print('Results:', results)
-
-    # ux
-    results_nodal_ux=structure.results[step]['nodal']['ux']
-    print('Nodal Results:', results_nodal_ux)
-
-    results_nodal_uy=structure.results[step]['nodal']['uy']
-    results_nodal_uz=structure.results[step]['nodal']['uz']
-
-    # import csv
-    # # Specify the file path
-    # file_path = 'C:\Temp\Data\{}_ux.csv'.format(i)
-
-    # # Open the file in write mode
-    # with open(file_path, 'w') as csv_file:
-    #     writer = csv.writer(csv_file)
-
-    #     # Write the header
-    #     writer.writerow(['Key', 'Value'])
-
-    #     # Write the data
-    #     for key, value in results_nodal_ux.items():
-    #         writer.writerow([key, value])
-
-
-    # # Specify the file path
-    # file_path = 'C:\Temp\Data\{}_uy.csv'.format(i)
-
-    # # Open the file in write mode
-    # with open(file_path, 'w') as csv_file:
-    #     writer = csv.writer(csv_file)
-
-    #     # Write the header
-    #     writer.writerow(['Key', 'Value'])
-
-    #     # Write the data
-    #     for key, value in results_nodal_uy.items():
-    #         writer.writerow([key, value])
-
-
-    # # Specify the file path
-    # file_path = 'C:\Temp\Data\{}_uz.csv'.format(i)
-
-    # # Open the file in write mode
-    # with open(file_path, 'w') as csv_file:
-    #     writer = csv.writer(csv_file)
-
-    #     # Write the header
-    #     writer.writerow(['Key', 'Value'])
-
-    #     # Write the data
-    #     for key, value in results_nodal_uz.items():
-    #         writer.writerow([key, value])
-
-
-    # # save coordinates (list format), in a csv file
-
-
-    # # # Specify the file path
-    # file_path = 'C:\Temp\Data\{}_coorx.csv'.format(i)
-    # # Open the file in write mode
-    # with open(file_path, 'w') as csv_file:
-    #     writer = csv.writer(csv_file)
-
-    #     # Write each list element as a separate row
-    #     for item in node0_x:
-    #         writer.writerow([item])
-
-    # # # Specify the file path
-    # file_path = 'C:\Temp\Data\{}_coory.csv'.format(i)
-    # # Open the file in write mode
-    # with open(file_path, 'w') as csv_file:
-    #     writer = csv.writer(csv_file)
-
-    #     # Write each list element as a separate row
-    #     for item in node0_y:
-    #         writer.writerow([item])
-
-    # # # Specify the file path
-    # file_path = 'C:\Temp\Data\{}_coorz.csv'.format(i)
-    # # Open the file in write mode
-    # with open(file_path, 'w') as csv_file:
-    #     writer = csv.writer(csv_file)
-
-    #     # Write each list element as a separate row
-    #     for item in node0_z:
-    #         writer.writerow([item])
-
-
-    print('Data saved to CSV successfully.')
-
-
-    return None
 
 
 # ==============================================================================
