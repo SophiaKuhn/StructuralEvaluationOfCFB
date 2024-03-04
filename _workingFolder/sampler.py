@@ -1,6 +1,6 @@
 # Author(s): Sophia Kuhn (ETH Zürich)
 
-
+from typing import Dict, List, Union
 
 import matplotlib.pyplot as plt
 import math as m
@@ -65,10 +65,48 @@ def hist_matrix(df, n_cols=4, bins=20, color='gray', edgecolor='darkgray'):
     plt.show()  # Display the histograms
 
 
-
+### from here downward code in progress...!
 #sampler
+    
+parameterStudie1={'Ranges' :{'L': (2000.,18000.),
+                                    'b1' : (3000.,20000.),
+                                    't_p': (200.,1200.),
 
-class SamplesGenerator:
+                                    't_w':(200., 1200.),   # Wall Thickness [mm]
+                                    'h_w' :(2000.,5000.), 
+                                    },
+                'Constants' : {'fsy': 390,
+                                        'oo' : 30,
+                                        'd3_plate': 12
+                                    }
+                }
+
+hero = {'L': 5800,
+        'b1': 9720,
+        't_p': 400,
+        't_w': 400,
+        'h_w': 2580,
+        'd1_plate': 24,
+        'd4_plate': 24,
+        'd2_plate':12,
+        's_plate': 200,
+        'd1_walls': 14,
+        'd4_walls': 24,
+        's_walls': 200,
+        'fcc': 12.8,
+        'fsy': 390,
+        'fsu_fac': 1.08,
+        's': 0.18179012,
+        'beta': 5}
+
+
+    
+variableRanges ={'L': (2000.,18000.),
+                             'b1' : (3000.,20000.)
+                             }
+    
+
+class CFBSamplingSpace:
 
     """
     Samples values according to certain strategies.
@@ -82,8 +120,74 @@ class SamplesGenerator:
         to optimize future sampling campaigns,
     """
 
-    def __init__(self,n_samples):
-        self.verbalise='Test'
+    def __init__(self,variables=None, parameterStudie=1):
+        
+        self.parameterStudie=parameterStudie
+        
+        if variables == None:
+            if parameterStudie==1:
+                variables=parameterStudie1['Ranges']
+
+            else:
+                raise Exception('Not Implemented')
+        self.variables=variables
+
+
+        if parameterStudie==1:
+            self.ranges={k: parameterStudie1['Ranges'][k] for k in variables if k in parameterStudie1['Ranges']}
+            self.constants=parameterStudie1['Constants']
+
+        
+
+
+
+        
+
+    
+    def _get_parameterStudie(self):
+
+        parameterStudie=self.parameterStudie
+
+
+        if parameterStudie == 1:
+
+            variableRanges ={'L': (2000.,18000.),
+                             'b1' : (3000.,20000.)
+                             }
+            
+            variableConstants ={'fsy': 390,
+                                'oo' : 30,
+                                'd3_plate': 12
+                                }
+        
+
+        else:
+            raise Exception('The defined parameterStudie is invalid.')
+        
+        
+        return variableRanges,variableConstants
+
+        
+
+
+# class SamplesGenerator:
+
+
+
+#     """
+#     Samples values according to certain strategies.
+
+#     Parameters
+#     ----------
+#     strategies : List[Strategy]
+#         List of strategies to be used for sampling.
+#     objective : Operator, optional, default=None
+#         Objective to be optimised. The sampler is trained using the objective values of the samples, in order
+#         to optimize future sampling campaigns,
+#     """
+
+#     def __init__(self,n_samples):
+#         self.verbalise='Test'
 
 # ==============================================================================
 # Debugging
