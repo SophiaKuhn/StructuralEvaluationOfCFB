@@ -577,6 +577,8 @@ loc coor
             -
         output : bool
             Print terminal output.
+        ansys_version: string
+            Ansys version that shoul be used. (e.g. '24' for version 2024 (v241))
 
         Returns
         -------
@@ -659,6 +661,8 @@ loc coor
             Specific components to extract from the fields data.
         step : list
             For which load step(s) the results are extracted to a txt.
+        ansys_version: string
+            Ansys version that shoul be used. (e.g. '24' for version 2024 (v241))
 
         Returns
         -------

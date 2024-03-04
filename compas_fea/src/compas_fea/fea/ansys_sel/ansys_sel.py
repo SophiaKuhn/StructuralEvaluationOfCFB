@@ -97,6 +97,8 @@ def launch_process(structure, exe, cpus, output, ansys_version=None):
         Number of CPU cores to use.
     output : bool
         Print terminal output.
+    ansys_version: string
+            Ansys version that shoul be used (e.g. '24' for version 2024 (v241))
 
     Returns
     -------
