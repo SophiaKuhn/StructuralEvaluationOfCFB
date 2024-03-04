@@ -84,7 +84,7 @@ def input_generate(structure, fields, output, lstep, sbstep):
 # -------------------------------------------------------------------------
 # Run ANSYS APDL with the generated APDL (.inp) file
 # -------------------------------------------------------------------------
-def launch_process(structure, exe, cpus, output):
+def launch_process(structure, exe, cpus, output, ansys_version=None):
     """ Runs the analysis through Ansys.
 
     Parameters
@@ -129,7 +129,20 @@ def launch_process(structure, exe, cpus, output):
                   
 
     # Set options
-    ansys_path = 'C:\\Program Files\\ANSYS Inc\\v221\\ansys\\bin\\winx64\\ANSYS221.exe'
+    if ansys_version==None:
+        if os.path.exists('C:\\Program Files\\ANSYS Inc\\v251\\ansys\\bin\\winx64\\ANSYS251.exe'):
+            ansys_version='25'
+        elif os.path.exists('C:\\Program Files\\ANSYS Inc\\v241\\ansys\\bin\\winx64\\ANSYS241.exe'):
+            ansys_version='24'
+        elif os.path.exists('C:\\Program Files\\ANSYS Inc\\v231\\ansys\\bin\\winx64\\ANSYS231.exe'):
+            ansys_version='23'
+        elif os.path.exists('C:\\Program Files\\ANSYS Inc\\v221\\ansys\\bin\\winx64\\ANSYS221.exe'):
+            ansys_version='22'
+        else: 
+            raise Exception("No Ansys Version was found. Please define the ansys version you would like to use.")  
+    
+    ansys_path = 'C:\\Program Files\\ANSYS Inc\\v{}1\\ansys\\bin\\winx64\\ANSYS{}1.exe'.format(ansys_version,ansys_version)
+    print('Ansys Version v'+ansys_version+'1 is used.')
     lic_str = 'ansys'
     cpus = 1
     inp_path = os.path.join(path, name + '.inp')

@@ -560,7 +560,7 @@ loc coor
             raise NotImplementedError
 
 
-    def analyse(self, software, exe=None, cpus=4, license='research', delete=True, output=True, error_found=False):
+    def analyse(self, software, exe=None, cpus=4, license='research', delete=True, output=True, error_found=False, ansys_version=None):
         """Runs the analysis through the chosen FEA software / library.
 
         Parameters
@@ -587,7 +587,7 @@ loc coor
 
         if software == 'ansys_sel':
             cpus = 1 if license == 'student' else cpus
-            error_found=ansys_sel.launch_process(self, exe=exe, cpus=cpus, output=output)            
+            error_found=ansys_sel.launch_process(self, exe=exe, cpus=cpus, output=output, ansys_version=ansys_version)            
 
         else:
             raise NotImplementedError
@@ -634,7 +634,7 @@ loc coor
             raise NotImplementedError
 
     def analyse_and_extract(self, software, fields='u', exe=None, cpus=4, license='research', output=True, save=False,
-                            return_data=True, components=None, ndof=6, lstep = 'last', sbstep = 'last'):
+                            return_data=True, components=None, ndof=6, lstep = 'last', sbstep = 'last', ansys_version=None):
         """Runs the analysis through the chosen FEA software / library and extracts data.
 
         Parameters
@@ -668,7 +668,7 @@ loc coor
 
         self.write_input_file(software=software, fields=fields, output=output, save=save, ndof=ndof, lstep=lstep, sbstep=sbstep)
 
-        error_found=self.analyse(software=software, exe=exe, cpus=cpus, license=license, output=output)
+        error_found=self.analyse(software=software, exe=exe, cpus=cpus, license=license, output=output, ansys_version=ansys_version)
         print('Error was found:', error_found)
         self.extract_data(software=software, fields=fields, exe=exe, license=license, output=output,
                           return_data=return_data, components=components, error_found=error_found)
