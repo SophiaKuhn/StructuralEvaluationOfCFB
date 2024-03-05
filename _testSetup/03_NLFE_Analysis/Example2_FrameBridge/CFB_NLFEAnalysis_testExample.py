@@ -350,7 +350,7 @@ mdl.steps_order = ['step_1','step_2', 'step_3', 'step_4']
 # Run analyses
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-mdl.analyse_and_extract(software='ansys_sel', fields=[ 'u','eps','sig_sr', 'sf', 's'], lstep = ['step_4'])  #'sf', 's'
+mdl.analyse_and_extract(software='ansys_sel',license='research', fields=[ 'u','eps','sig_sr', 'sf', 's'], lstep = ['step_4'])  #'sf', 's'
 print('Analysis Finished')
     
     

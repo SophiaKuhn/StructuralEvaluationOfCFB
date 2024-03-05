@@ -55,8 +55,7 @@ name = 'NLFE'
 path = 'C:\Temp\\'
 mdl = Structure(name=name, path=path)
 
-# Structure
-mdl = Structure(name=name, path=path)
+
 
 # Shell Elements
 rhino.add_nodes_elements_from_layers(mdl, mesh_type='ShellElement', layers=[ 'elset_deck'] ) 
