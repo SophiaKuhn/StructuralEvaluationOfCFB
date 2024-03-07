@@ -458,13 +458,13 @@ for i in range(start,end+1):
         os.makedirs(subfolder_path)
   
     #save structure to a pickle file
-    file_name='{}_{}_structure.pkl'.format(idx_s,ID)
+    file_name='{}_{}_structure'.format(idx_s,ID)
     save_to_pickle(obj=mdl, folder_path=subfolder_path, file_name=file_name)
     
     
     # save results dict to a json file
     res_dict=mdl.results
-    file_name='{}_{}_analysisResults.json'.format(idx_s,ID)
+    file_name='{}_{}_analysisResults'.format(idx_s,ID)
     save_to_json(save_dict=res_dict,folder_path=subfolder_path,
                     file_name=file_name)
     
