@@ -71,7 +71,7 @@ import math as m
 
 # define sampling iteration (= Batch number)
 #!!!!INPUT HERE!!!!!
-idx_s = 1
+idx_s = 2
 
 
 
@@ -96,7 +96,7 @@ print('n_samples: ',n_samples)
 #--------------------------------------------------------------------------
 #!!!!INPUT HERE!!!!!
 start = 0
-end = 0#n_samples
+end = 2#n_samples
 for i in range(start,end+1):
     
             
@@ -412,7 +412,7 @@ for i in range(start,end+1):
     # Run analyses
     # ------------------------------------------------------------------------------
     # ------------------------------------------------------------------------------
-    mdl.analyse_and_extract(software='ansys_sel', fields=[ 'u','eps','sig_sr', 'sf', 's'], lstep = ['step_4'])  #'sf', 's'
+    mdl.analyse_and_extract(software='ansys_sel',license='research', fields=[ 'u','eps','sig_sr', 'sf', 's'], lstep = ['step_4'])  #'sf', 's'
     
     print('Analysis Finished')
     

@@ -4,6 +4,7 @@
 import pandas as pd
 import os
 import json 
+import pickle
 
 def concrete_bending_verification(structure=None, results = None, step=None, return_type='dict', verbalise=True):
 
