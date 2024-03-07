@@ -15,6 +15,8 @@ d2_plate,12.0
 d1_plate,24.0
 s_plate,200.0
 d4_walls,24.0
+d3_walls,12.0
+d2_walls,12.0
 d1_walls,14.0
 s_walls,200.0
 fcc,12.8
@@ -34,6 +36,7 @@ b_sec1_b1,0.33
 b_sec2_b1,0.33
 h_S1_3,0.33
 h_S7_9,0.33
+mesh_size_factor,3.0
 b2,9720.0
 b_sec1_b2,0.33
 b_sec2_b2,0.33
