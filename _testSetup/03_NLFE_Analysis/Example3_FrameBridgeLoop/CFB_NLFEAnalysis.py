@@ -165,28 +165,10 @@ for i in range(start,end+1):
     
     
     # ---------Initialise---------------------
-    if ID % 9== 0:
-        n_name=9
-    elif ID % 8== 0:
-        n_name=8
-    elif ID % 7 == 0:
-        n_name=7
-    elif ID % 6 == 0:
-        n_name=6
-    elif ID % 5 == 0:
-        n_name=5
-    elif ID % 4 == 0:
-        n_name=4
-    elif ID % 3 == 0:
-        n_name=3
-    elif ID % 2 == 0:
-        n_name=2
-    else:
-        n_name=1
         
         
     
-    name = 'NLFE_CFB{}'.format(n_name)#_{}_{}'.format(idx_s, ID)
+    name = 'NLFE_CFB{}'.format(i)
     print('Analysis File Name: ',name)
     path = 'C:\Temp\\'
     mdl = Structure(name=name, path=path)

@@ -4,6 +4,7 @@
 import pandas as pd
 import os
 import json 
+import pickle
 
 def concrete_bending_verification(structure=None, results = None, step=None, return_type='dict', verbalise=True):
 
@@ -278,6 +279,7 @@ def calc_eta(idx_s, start_id, end_id, step, extract_from ='results', folder_name
         elif extract_from=='results':
             if verbalise:
                 print("Extracting from results.json file")
+            #TODO: use the get_results(9 function for this) but then the path not fund handling has to be checked
             filepath=folder_path+'\\{}_Batch\\{}_{}_CFB\\{}_{}_analysisResults.json'.format(idx_s,idx_s,ID,idx_s,ID)
             if os.path.exists(filepath):
                 with open(filepath, 'r') as file:
@@ -319,21 +321,6 @@ def calc_eta(idx_s, start_id, end_id, step, extract_from ='results', folder_name
             else:
                 df_res=pd.concat([df_res,df_c_s])
 
-        # # if no structure pickle or result json file exists (due to calculation error or simply wrong path)
-        # if error_flag:
-        #     error_count+=1
-
-        #     if verbalise:
-        #         print('eta_min_c and eta_min_s are set to 0!')
-        #     res_concrete=pd.DataFrame({'eta_min_c' : [0.], 'x_c' : [None], 'y_c' : [None], 'z_c' : [None], 'Location_c':[None], 'GP_count_c': [None]})
-        #     res_steel=pd.DataFrame({'eta_min_s' : [0.], 'x_s' : [None], 'y_s' : [None], 'z_s' : [None], 'Location_s':None, 'GP_count_s': [None]})
-        #     df_c_s=pd.concat([res_steel,res_concrete], axis=1)
-        #     df_c_s['ID']=ID
-            
-        #     if ID==start_id:
-        #         df_res=df_c_s
-        #     else:
-        #         df_res=pd.concat([df_res,df_c_s])
 
         # if no structure pickle or result json file exists (due to an error (not divergence) or simply wrong path)
         if nofile:
@@ -343,3 +330,57 @@ def calc_eta(idx_s, start_id, end_id, step, extract_from ='results', folder_name
     
     print('There were {} Structured that resulted in an error during analysis. (Error IDs: {})'.format(error_count,error_ids))
     return df_res
+
+
+def get_results(idx_s, ID, step=None, extract_from ='results', folder_name='CFBData', verbalise=True):
+    '''
+    This function loads the results dict for bridge with the ID from the sampling batch idx_s. If a step is provided only the results dict for that step is returned.
+
+    Parameters:
+    idx_s: integer
+        Index of sampling. File identifier.
+    ID: integer
+        Structure ID.
+    step: string
+        the name of the analysis step (e.g. "step_4")  
+    extract_from: string
+        From what type of file should the analysis results be extracted. Possible is from a "results" file.
+    folder_name: string
+        The name of the folder where the results are located in
+    verbalise: bool
+        Flag that defines weather the function should print progress information (if set to True) 
+        or should run without printing any progress information (if set to False).
+
+    
+    Returns:
+    results: dict
+        The function returns the results dict for the requested bridge identifiers (and load step).
+    '''
+        
+    #construct path
+    current_directory = os.getcwd()
+    filepath=current_directory+'\\CFBData\\{}_Batch\\{}_{}_CFB\\{}_{}_analysisResults.json'.format(idx_s,idx_s,ID,idx_s,ID)
+    if verbalise:
+        print('filepath: ',filepath)
+
+    # Load results dict form json file
+    if os.path.exists(filepath):
+        print('Path found.')
+        with open(filepath, 'r') as file:
+            results = json.load(file)
+            if verbalise:
+                print('Results imported')
+            if not step==None:
+                results=results[step]
+             
+    else: 
+        if verbalise:
+            print('Path not found.')
+        results=None
+
+
+    return results
+
+
+
+
