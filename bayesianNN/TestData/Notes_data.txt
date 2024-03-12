@@ -1,0 +1,5 @@
+800: 10000 Smaples lhc sampling msf=3
+
+542: 20 samples 1D L study msf=1 (constant parameer different than hero)
+
+601: 50 samples 1D L study msf=3 (hero parameters else)
