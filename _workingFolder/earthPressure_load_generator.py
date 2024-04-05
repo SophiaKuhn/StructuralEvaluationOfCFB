@@ -141,7 +141,7 @@ def earthPressure_backfill_generator(structure, elements, h_w, t_p, h_G, gamma_E
     return ['earthPressure_backfill']
 
 
-def earthPressure_liveload_generator(structure, s, h_w, t_p, phi_k,gamma_Q=1, verbalise=True):
+def earthPressure_liveload_generator(structure, s, h_w, t_p, phi_k,gamma_Q=1, name=None, verbalise=True):
     
     '''
     This function calculates the earth pressure area load magnitude that results from the live load of a track
@@ -159,6 +159,8 @@ def earthPressure_liveload_generator(structure, s, h_w, t_p, phi_k,gamma_Q=1, ve
         Deck Slab Thickness [mm]
     phi_k: int
         ..[Degree] (e.g. 30)
+    name : str
+        Name of the track (e.g. "Track1")
     verbalise: bool
         Defining weather to verbalise the calculation 
 
@@ -178,7 +180,11 @@ def earthPressure_liveload_generator(structure, s, h_w, t_p, phi_k,gamma_Q=1, ve
     # Create layer
     #-------------------------------------------------------
     # define layer name ( and later name of area load)
-    layer_name = "EarthPressure_liveLoad_area"
+    if name == None:
+        layer_name = "EarthPressure_liveLoad_area"
+    else:
+        layer_name = "EarthPressure_liveLoad_area_{}".format(name)
+
 
     # create the new layer
     if rs.IsLayer(layer_name):
@@ -234,7 +240,10 @@ def earthPressure_liveload_generator(structure, s, h_w, t_p, phi_k,gamma_Q=1, ve
     loaded_element_numbers=area_load_generator_elements(structure, layer_name)
 
     # add load
-    load_name='earthPressure_liveLoad'
+    if name == None:
+        load_name='earthPressure_liveLoad'
+    else:
+        load_name='earthPressure_liveLoad_{}'.format(name)
     structure.add(AreaLoad(load_name, elements=loaded_element_numbers,x=0,y=0,z=p,axes ='local')) # postive z-dir is inwards here
 
     # set default layer back to active layer
