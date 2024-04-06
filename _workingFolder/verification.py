@@ -6,6 +6,9 @@ import os
 import json 
 import pickle
 
+
+
+
 def concrete_bending_verification(structure=None, results = None, step=None, return_type='dict', verbalise=True):
 
     '''
@@ -209,9 +212,122 @@ def steel_bending_verification(structure=None, results = None, step=None, return
 
     return res
 
+def concrete_bending_verification_stresses(structure=None, results = None, step=None, return_type='dict', verbalise=True):
+
+    '''
+    This function evaluates the structure results with respect to concrete bending. 
+    It caluclates eta_stresses based on the ratio between the calculated fcd_eff and the caluclated acting stresses (sigma). 
+    fcd_eff is the effective concrete compressive stress, which is reduced due to the corresponnding strainstate (eps_1) at the individual position.
+
+    Parameters:
+    structure: structure object
+        a structure object defined after see function ....
+    results: dict
+        Contains the analysis results for each evaluation step.
+    step: string
+        the name of the analysis step (e.g. "step_4")
+    return type: string
+        the type of the return value. Possible return types are dict and df. The default is dict.
+    verbalise: bool
+        Flag that defines weather the function should print progress information (if set to True) 
+        or should run without printing any progress information (if set to False).
+
+    
+    Returns:
+    res: dict or pandas dataframe
+        The function returns a dict with the verification results 
+        The dict contains the following keys: 'eta_min_c_stresses', 'x_c_stresses', 'y_c_stresses', 'z_c_stresses', 'Location_c_stresses', 'GP_count_c'
+    '''
+
+    # if not results but the structure is given we first extract the results dict from the structure pkl file
+    if results == None:
+        if structure==None:
+            raise Exception("You have not provided a structure of results. You have to provide at one!")
+        
+        results = structure.results
+        if verbalise:
+            print('The structure was converted to results dict')
+
+    # 'fcc_eff_bot'
+    # 'sig_y_top'
+    # 'sig_x_top'
+    # 'fcc_eff_top'
+    # 'sig_x_bot'
+    # 'sig_y_bot'
+
+    # save relevant values from dict into a data frame for easyer handling
+    df_sig = pd.DataFrame({'sig_x_top':list(results[step]['GP']['sig_x_top'].values()),
+                         'sig_y_top':list(results[step]['GP']['sig_y_top'].values()),
+                         'sig_x_bot':list(results[step]['GP']['sig_x_bot'].values()),
+                         'sig_y_bot':list(results[step]['GP']['sig_y_bot'].values()),
+
+                         'coor_x_sig_sr_1L':list(results[step]['GP']['coor_x_sig_sr_1L'].values()),
+                        'coor_y_sig_sr_1L':list(results[step]['GP']['coor_y_sig_sr_1L'].values()),
+                         'coor_z_sig_sr_1L':list(results[step]['GP']['coor_z_sig_sr_1L'].values()),
 
 
-def calc_eta(idx_s, start_id, end_id, step, extract_from ='results', folder_name='CFBData', verbalise=True):
+                        'fcc_eff_top':list(results[step]['GP']['fcc_eff_top'].values()),
+                        'fcc_eff_bot':list(results[step]['GP']['fcc_eff_bot'].values()),
+                         } )       
+
+
+    #define calculation of eta_stresses
+    def calculate_eta_sig_ifNeg(row):
+        # Extracting the values for fcc_eff_top and sig_x_top from the row
+        x = row[0]
+        y = row[1]
+        # Performing the division if sig is less than 0
+        if y < 0:
+            return -x / y  # fcc_eff/sig
+        else:
+            return None  # Returning None if the condition is not met
+
+    # Calculate eta_stresses for for each GP an top and bot, for directions x and y (--> 4 times per GP) 
+    df_sig['eta_x_top_stresses']=df_sig[['fcc_eff_top','sig_x_top']].apply(calculate_eta_sig_ifNeg,axis=1)
+    df_sig['eta_y_top_stresses']=df_sig[['fcc_eff_top','sig_y_top']].apply(calculate_eta_sig_ifNeg,axis=1)
+    df_sig['eta_x_bot_stresses']=df_sig[['fcc_eff_bot','sig_x_bot']].apply(calculate_eta_sig_ifNeg,axis=1)
+    df_sig['eta_y_bot_stresses']=df_sig[['fcc_eff_bot','sig_y_bot']].apply(calculate_eta_sig_ifNeg,axis=1)
+
+
+    # get minimum eta for each Gaus Point
+    df_sig['eta_min_GP_stresses'] = df_sig[['eta_x_top_stresses', 'eta_y_top_stresses', 'eta_x_bot_stresses', 'eta_y_bot_stresses']].min(axis=1)
+    # Get Minimum eta value of structure
+    eta_min_structure_stresses = df_sig['eta_min_GP_stresses'].min()
+    #min_value = df_eps[['eta_1_bot', 'eta_3_bot', 'eta_1_top', 'eta_3_top']].min().min()
+
+    # Find the location (columnname) of the minimum eta value
+    location = df_sig[['eta_x_top_stresses', 'eta_y_top_stresses', 'eta_x_bot_stresses', 'eta_y_bot_stresses']][df_sig == eta_min_structure_stresses].stack().index.tolist()[0][1]
+    
+
+    # Getting coordinates of min position
+    idx_eta_min_structure_stresses = df_sig['eta_min_GP_stresses'].idxmin()
+    x = df_sig.loc[idx_eta_min_structure_stresses, 'coor_x_sig_sr_1L']
+    y = df_sig.loc[idx_eta_min_structure_stresses, 'coor_y_sig_sr_1L']
+    z = df_sig.loc[idx_eta_min_structure_stresses, 'coor_z_sig_sr_1L']
+
+    #TODO: At the moment I extract the coordinates of the first reinfoecement layer, x,y coordinate is exactly the same, sonly the z coordinate is a bit off then
+    # TODO: find the right z coordinate, then this also includes if it is in top or bottom layer...
+
+    # Count_ mu values smaller than 1
+    # GP_count= df_eps[df_eps['eta_min_GP'] < 1]['eta_min_GP'].count()
+
+
+    # write a dict with results and print
+    res_concrete={'eta_min_c_stresses' : [eta_min_structure_stresses], 'x_c_stresses' : [x], 'y_c_stresses' : [y], 'z_c_stresses' : [z], 'Location_c_stresses':[location]} #, 'GP_count_c': [GP_count]}
+
+    if return_type=='dict':
+        res=res_concrete
+    elif return_type=='df':
+        res= pd.DataFrame(res_concrete)
+    else:
+        raise Exception("Only return types dict and df are implemented. Define one of these types.")
+    
+    return res
+
+
+
+
+def calc_eta(idx_s, start_id, end_id, step, extract_from ='results', folder_name='CFBData', with_eta_stresses=False, verbalise=True):
 
     '''
     This function iterates from start_id to end_id. Opens the corresponding file. 
