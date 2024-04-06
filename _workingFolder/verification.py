@@ -248,12 +248,6 @@ def concrete_bending_verification_stresses(structure=None, results = None, step=
         if verbalise:
             print('The structure was converted to results dict')
 
-    # 'fcc_eff_bot'
-    # 'sig_y_top'
-    # 'sig_x_top'
-    # 'fcc_eff_top'
-    # 'sig_x_bot'
-    # 'sig_y_bot'
 
     # save relevant values from dict into a data frame for easyer handling
     df_sig = pd.DataFrame({'sig_x_top':list(results[step]['GP']['sig_x_top'].values()),
@@ -347,6 +341,8 @@ def calc_eta(idx_s, start_id, end_id, step, extract_from ='results', folder_name
         From what type of file should the analysis results be extracted. Possible is "structure" and "results" file.
     folder_name: string
         The name of the folder where the results are located in
+    with_eta_stresses: bool
+        Flag that defines weather the eta_stresses should also be caluclated for concrete in bending
     verbalise: bool
         Flag that defines weather the function should print progress information (if set to True) 
         or should run without printing any progress information (if set to False).
@@ -418,16 +414,28 @@ def calc_eta(idx_s, start_id, end_id, step, extract_from ='results', folder_name
                         print('The rsults.json file exits. However an error happened during the NLFE Analysis.')
                         print('eta_min_c and eta_min_s are set to 0!')
 
-                    res_concrete=pd.DataFrame({'eta_min_c' : [0.], 'x_c' : [None], 'y_c' : [None], 'z_c' : [None], 'Location_c':[None], 'GP_count_c': [None]})
                     res_steel=pd.DataFrame({'eta_min_s' : [0.], 'x_s' : [None], 'y_s' : [None], 'z_s' : [None], 'Location_s':None, 'GP_count_s': [None]})
-                    df_c_s=pd.concat([res_steel,res_concrete], axis=1)
+                    res_concrete=pd.DataFrame({'eta_min_c' : [0.], 'x_c' : [None], 'y_c' : [None], 'z_c' : [None], 'Location_c':[None], 'GP_count_c': [None]})
+                    if with_eta_stresses:
+                        res_concrete_stresses=pd.DataFrame({'eta_min_c_stresses' : [0.], 'x_c_stresses' : [None], 'y_c_stresses' : [None], 'z_c_stresses' : [None], 'Location_c_stresses':[None]})
+
+                    if with_eta_stresses:
+                        df_c_s=pd.concat([res_steel,res_concrete, res_concrete_stresses], axis=1)
+                    else:
+                        df_c_s=pd.concat([res_steel,res_concrete], axis=1)
                     df_c_s['ID']=ID
 
                 else:
                     # extract max values from the analysis results of this structre 
-                    df_conc=concrete_bending_verification(results=results, step=step, return_type='df', verbalise=verbalise)
                     df_steel=steel_bending_verification(results=results, step=step, return_type='df',verbalise=verbalise)
-                    df_c_s=pd.concat([df_steel,df_conc], axis=1)
+                    df_conc=concrete_bending_verification(results=results, step=step, return_type='df', verbalise=verbalise)
+                    if with_eta_stresses:
+                        df_conc_stresses=concrete_bending_verification_stresses(results=results, step=step, return_type='df',verbalise=verbalise)
+
+                    if with_eta_stresses:
+                        df_c_s=pd.concat([df_steel,df_conc, df_conc_stresses], axis=1)
+                    else:
+                        df_c_s=pd.concat([df_steel,df_conc], axis=1)
                     df_c_s['ID']=ID
             else:
                 raise Exception("The results/ structure file exists however the defined step is empty. No analysis results can be extracted.")
