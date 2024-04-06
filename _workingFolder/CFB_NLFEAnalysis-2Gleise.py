@@ -96,7 +96,7 @@ print('n_samples: ',n_samples)
 #--------------------------------------------------------------------------
 #!!!!INPUT HERE!!!!!
 start = 0
-end = 2#n_samples
+end = 0#n_samples
 for i in range(start,end+1):
     
             
@@ -145,9 +145,11 @@ for i in range(start,end+1):
     fsu = int(float(data_dict["fsu"][i]))
     esu = float(data_dict["esu"][i])
     # load parameter
-    s=float(data_dict["s"][i])
-    beta=float(data_dict["beta"][i])
-    
+    s1=float(data_dict["s1"][i])
+    beta1=float(data_dict["beta1"][i])
+    s2=float(data_dict["s2"][i])
+    beta2=float(data_dict["beta2"][i])
+
     h_G=float(data_dict["h_G"][i])
     gamma_E=float(data_dict["gamma_E"][i])
     phi_k=float(data_dict["phi_k"][i])
@@ -378,23 +380,31 @@ for i in range(start,end+1):
     ## Live Loads
     #Normalspurverkehr Load generator 
     y_A_Biegung=(L_el/2) #-(m.cos(m.radians(beta))*1500)
-    NSV_load_names=Normalspurbahnverkehr_load_generator(mdl,name='Gleis1', l_Pl=L_el, h_Pl=t_p, s=s*b1, beta=beta,
-                                                         q_Gl=q_Gl, b_Bs=b_Bs, h_Strich=h_G,h_GL=160, h_w=h_w, Q_k=Q_k, y_A=y_A_Biegung,m=4650,
+    NSV_load_names1=Normalspurbahnverkehr_load_generator(mdl,name='Gleis1', l_Pl=L_el, h_Pl=t_p, s=s1, beta=beta1,
+                                                         q_Gl=q_Gl, b_Bs=b_Bs, h_Strich=550,h_GL=160, h_w=h_w, Q_k=Q_k, y_A=y_A_Biegung,m=4650,
                                                          gamma_G=1.35, gamma_Q=1.45, verbalise=True)
 
-    NSV_dead_loads=[NSV_load_names[0]] #Deadloads of tracks and concrete sleeper
-    NSV_live_loads=NSV_load_names[1:] # Life load of trains
+    NSV_dead_loads1=[NSV_load_names1[0]] #Deadloads of tracks and concrete sleeper
+    NSV_live_loads1=NSV_load_names1[1:] # Life load of trains
 
+    NSV_load_names2=Normalspurbahnverkehr_load_generator(mdl,name='Gleis2', l_Pl=L_el, h_Pl=t_p, s=s2, beta=beta2,
+                                                         q_Gl=q_Gl, b_Bs=b_Bs, h_Strich=550,h_GL=160, h_w=h_w, Q_k=Q_k, y_A=y_A_Biegung,m=4650,
+                                                         gamma_G=1.35, gamma_Q=1.45, verbalise=True)
+
+    NSV_dead_loads2=[NSV_load_names2[0]] #Deadloads of tracks and concrete sleeper
+    NSV_live_loads2=NSV_load_names2[1:] # Life load of trains
     
     # Earth pressure load generator (resulting from live load) on wall 1 (only one sided)
-    earth_pressure_liveload = earthPressure_liveload_generator(structure=mdl, s=s*b1, h_w=h_w, t_p=t_p, phi_k=phi_k, gamma_Q=1.45)
+    earth_pressure_liveload1 = earthPressure_liveload_generator(structure=mdl, s=s1, h_w=h_w, t_p=t_p, phi_k=phi_k, gamma_Q=1.45)
+    earth_pressure_liveload2 = earthPressure_liveload_generator(structure=mdl, s=s2, h_w=h_w, t_p=t_p, phi_k=phi_k, gamma_Q=1.45)
+
 
     
 
     #Load Steps
     dead_loads=['load_gravity']
-    superimposed_dead_loads = earth_pressure_gravel_load+ earth_pressure_backfill_load + NSV_dead_loads #+gravel_pressure 
-    live_loads = NSV_live_loads +earth_pressure_liveload
+    superimposed_dead_loads = earth_pressure_gravel_load+ earth_pressure_backfill_load + NSV_dead_loads1 + NSV_dead_loads2 #+gravel_pressure 
+    live_loads = NSV_live_loads1+ NSV_live_loads2 +earth_pressure_liveload1 + earth_pressure_liveload2
     
     
     mdl.add([
@@ -412,7 +422,7 @@ for i in range(start,end+1):
     # Run analyses
     # ------------------------------------------------------------------------------
     # ------------------------------------------------------------------------------
-    mdl.analyse_and_extract(software='ansys_sel',license='research', fields=[ 'u','eps','sig_sr', 'sf', 's'], lstep = ['step_4'])  #'sf', 's'
+    mdl.analyse_and_extract(software='ansys_sel',license='student', fields=[ 'u','eps','sig_sr', 'sf', 's'], lstep = ['step_4'])  #'sf', 's'
     
     print('Analysis Finished')
     
@@ -423,29 +433,29 @@ for i in range(start,end+1):
 #    # # ------------------------------------------------------------------------------
 #    
 #    #Plot Results for step_3
-##    rhino.plot_data(mdl, lstep='step_4', field='uz', cbar_size=1,scale=300.0, source='CMMUsermat')
-##    rhino.plot_data(mdl, lstep='step_4', field='ux', cbar_size=1, scale=300.0,source='CMMUsermat')
-##    rhino.plot_data(mdl, lstep='step_4', field='uy', cbar_size=1, scale=300.0, source='CMMUsermat')
+    rhino.plot_data(mdl, lstep='step_4', field='uz', cbar_size=1,scale=300.0, source='CMMUsermat')
+    rhino.plot_data(mdl, lstep='step_4', field='ux', cbar_size=1, scale=300.0,source='CMMUsermat')
+    rhino.plot_data(mdl, lstep='step_4', field='uy', cbar_size=1, scale=300.0, source='CMMUsermat')
 ##    
 ##    rhino.plot_data(mdl, lstep='step_3', field='uz', cbar_size=1,scale=2000.0, source='CMMUsermat')
 ##    rhino.plot_data(mdl, lstep='step_3', field='ux', cbar_size=1, scale=2000.0,source='CMMUsermat')
 ##    rhino.plot_data(mdl, lstep='step_3', field='uy', cbar_size=1, scale=2000.0, source='CMMUsermat')
 ##    
-##    rhino.plot_data(mdl, lstep='step_4', field='uz', cbar_size=1,scale=2000.0, source='CMMUsermat')
-##    rhino.plot_data(mdl, lstep='step_4', field='ux', cbar_size=1, scale=2000.0,source='CMMUsermat')
-##    rhino.plot_data(mdl, lstep='step_4', field='uy', cbar_size=1, scale=2000.0, source='CMMUsermat')
+    rhino.plot_data(mdl, lstep='step_4', field='uz', cbar_size=1,scale=2000.0, source='CMMUsermat')
+    rhino.plot_data(mdl, lstep='step_4', field='ux', cbar_size=1, scale=2000.0,source='CMMUsermat')
+    rhino.plot_data(mdl, lstep='step_4', field='uy', cbar_size=1, scale=2000.0, source='CMMUsermat')
 #
-##    rhino.plot_principal_stresses(mdl, step='step_4', shell_layer='top', scale=10**2)
-##    rhino.plot_principal_stresses(mdl, step='step_4', shell_layer='bot', scale=10**2)
-##    rhino.plot_data(mdl, lstep='step_4', field='sf1', cbar_size=1, source='CMMUsermat')
-##    rhino.plot_data(mdl, lstep='step_4', field='sf2', cbar_size=1, source='CMMUsermat')
-##    rhino.plot_data(mdl, lstep='step_4', field='sf3', cbar_size=1, source='CMMUsermat')
-##    rhino.plot_data(mdl, lstep='step_4', field='sf4', cbar_size=1, source='CMMUsermat')
-##    rhino.plot_data(mdl, lstep='step_4', field='sf5', cbar_size=1, source='CMMUsermat')
-##    rhino.plot_data(mdl, lstep='step_4', field='sm1', cbar_size=1, source='CMMUsermat')
-##    rhino.plot_data(mdl, lstep='step_4', field='sm2', cbar_size=1, source='CMMUsermat')
-##    rhino.plot_data(mdl, lstep='step_4', field='sm2', cbar_size=1, source='CMMUsermat')
-##    rhino.plot_data(mdl, lstep='step_4', field='sm3', cbar_size=1, source='CMMUsermat')
+    rhino.plot_principal_stresses(mdl, step='step_4', shell_layer='top', scale=10**2)
+    rhino.plot_principal_stresses(mdl, step='step_4', shell_layer='bot', scale=10**2)
+    rhino.plot_data(mdl, lstep='step_4', field='sf1', cbar_size=1, source='CMMUsermat')
+    rhino.plot_data(mdl, lstep='step_4', field='sf2', cbar_size=1, source='CMMUsermat')
+    rhino.plot_data(mdl, lstep='step_4', field='sf3', cbar_size=1, source='CMMUsermat')
+    rhino.plot_data(mdl, lstep='step_4', field='sf4', cbar_size=1, source='CMMUsermat')
+    rhino.plot_data(mdl, lstep='step_4', field='sf5', cbar_size=1, source='CMMUsermat')
+    rhino.plot_data(mdl, lstep='step_4', field='sm1', cbar_size=1, source='CMMUsermat')
+    rhino.plot_data(mdl, lstep='step_4', field='sm2', cbar_size=1, source='CMMUsermat')
+    rhino.plot_data(mdl, lstep='step_4', field='sm2', cbar_size=1, source='CMMUsermat')
+    rhino.plot_data(mdl, lstep='step_4', field='sm3', cbar_size=1, source='CMMUsermat')
 #
 #    
 #   
