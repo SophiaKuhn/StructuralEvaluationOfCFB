@@ -71,7 +71,7 @@ import math as m
 
 # define sampling iteration (= Batch number)
 #!!!!INPUT HERE!!!!!
-idx_s = 42
+idx_s = 60
 
 
 
@@ -397,9 +397,9 @@ for i in range(start,end+1):
 
     
     # Earth pressure load generator (resulting from live load) on wall 1 (only one sided)
-    earth_pressure_liveload1 = earthPressure_liveload_generator(structure=mdl, s=s1, h_w=h_w, t_p=t_p, phi_k=phi_k, gamma_Q=1.45)
+    earth_pressure_liveload1 = earthPressure_liveload_generator(structure=mdl, s=s1, h_w=h_w, t_p=t_p, name="track1", phi_k=phi_k, gamma_Q=1.45)
 
-    earth_pressure_liveload2 = earthPressure_liveload_generator(structure=mdl, s=s2, h_w=h_w, t_p=t_p, phi_k=phi_k, gamma_Q=1.45)
+    earth_pressure_liveload2 = earthPressure_liveload_generator(structure=mdl, s=s2, h_w=h_w, t_p=t_p, name="track2", phi_k=phi_k, gamma_Q=1.45)
 
     
 
