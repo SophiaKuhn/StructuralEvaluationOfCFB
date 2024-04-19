@@ -113,7 +113,7 @@ mdl.steps_order = [ 'step_1', 'step_2', 'step_3' ]
 # Run analyses
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-mdl.analyse_and_extract(software='ansys_sel', fields=[ 'u', 'sf' ], lstep = ['step_3']) 
+mdl.analyse_and_extract(software='ansys_sel',license='student', fields=[ 'u', 'sf' ], lstep = ['step_3']) 
 
 # Plot Results
 # ------------------------------------------------------------------------------

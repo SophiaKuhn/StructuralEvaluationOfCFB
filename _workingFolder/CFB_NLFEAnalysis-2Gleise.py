@@ -381,7 +381,7 @@ for i in range(start,end+1):
     #Normalspurverkehr Load generator 
     y_A_Biegung=(L_el/2) #-(m.cos(m.radians(beta))*1500)
     NSV_load_names1=Normalspurbahnverkehr_load_generator(mdl,name='Gleis1', l_Pl=L_el, h_Pl=t_p, s=s1, beta=beta1,
-                                                         q_Gl=q_Gl, b_Bs=b_Bs, h_Strich=550,h_GL=160, h_w=h_w, Q_k=Q_k, y_A=y_A_Biegung,m=4650,
+                                                         q_Gl=q_Gl, b_Bs=b_Bs, h_Strich=770,h_GL=160, h_w=h_w, Q_k=Q_k, y_A=y_A_Biegung,m=4650,
                                                          gamma_G=1.35, gamma_Q=1.45, verbalise=True)
 
     NSV_dead_loads1=[NSV_load_names1[0]] #Deadloads of tracks and concrete sleeper
@@ -395,16 +395,15 @@ for i in range(start,end+1):
     NSV_live_loads2=NSV_load_names2[1:] # Life load of trains
     
     # Earth pressure load generator (resulting from live load) on wall 1 (only one sided)
-    earth_pressure_liveload1 = earthPressure_liveload_generator(structure=mdl, s=s1, h_w=h_w, t_p=t_p, phi_k=phi_k, gamma_Q=1.45)
-    earth_pressure_liveload2 = earthPressure_liveload_generator(structure=mdl, s=s2, h_w=h_w, t_p=t_p, phi_k=phi_k, gamma_Q=1.45)
-
+    earth_pressure_liveload_1 = earthPressure_liveload_generator(structure=mdl, s=s1, h_w=h_w, t_p=t_p,name="track_1" ,phi_k=phi_k, gamma_Q=1.45)
+    earth_pressure_liveload_2 = earthPressure_liveload_generator(structure=mdl, s=s2, h_w=h_w, t_p=t_p,name="track_2" ,phi_k=phi_k, gamma_Q=1.45)
 
     
 
     #Load Steps
     dead_loads=['load_gravity']
     superimposed_dead_loads = earth_pressure_gravel_load+ earth_pressure_backfill_load + NSV_dead_loads1 + NSV_dead_loads2 #+gravel_pressure 
-    live_loads = NSV_live_loads1+ NSV_live_loads2 +earth_pressure_liveload1 + earth_pressure_liveload2
+    live_loads = NSV_live_loads1+ NSV_live_loads2 +earth_pressure_liveload_1+earth_pressure_liveload_2
     
     
     mdl.add([
