@@ -71,7 +71,7 @@ import math as m
 
 # define sampling iteration (= Batch number)
 #!!!!INPUT HERE!!!!!
-idx_s = 60
+idx_s = 78
 
 
 
@@ -382,14 +382,14 @@ for i in range(start,end+1):
     y_A_Biegung=(L_el/2) #-(m.cos(m.radians(beta))*1500)
 
     NSV_load_names1=Normalspurbahnverkehr_load_generator(mdl,name='Gleis1', l_Pl=L_el, h_Pl=t_p, s=s1, beta=beta1,
-                                                         q_Gl=q_Gl, b_Bs=b_Bs, h_Strich=550.0,h_GL=160, h_w=h_w, Q_k=Q_k, y_A=y_A_Biegung,m=4650,
+                                                         q_Gl=q_Gl, b_Bs=b_Bs, h_Strich=770.0,h_GL=160, h_w=h_w, Q_k=Q_k, y_A=y_A_Biegung,m=4650,
                                                          gamma_G=1.35, gamma_Q=1.45, verbalise=True)
 
     NSV_dead_loads1=[NSV_load_names1[0]] #Deadloads of tracks and concrete sleeper
     NSV_live_loads1=NSV_load_names1[1:] # Life load of trains
 
     NSV_load_names2=Normalspurbahnverkehr_load_generator(mdl,name='Gleis2', l_Pl=L_el, h_Pl=t_p, s=s2, beta=beta2,
-                                                         q_Gl=q_Gl, b_Bs=b_Bs, h_Strich=550.0,h_GL=160, h_w=h_w, Q_k=Q_k, y_A=y_A_Biegung,m=4650,
+                                                         q_Gl=q_Gl, b_Bs=b_Bs, h_Strich=770.0,h_GL=160, h_w=h_w, Q_k=Q_k, y_A=y_A_Biegung,m=4650,
                                                          gamma_G=1.35, gamma_Q=1.45, verbalise=True)
 
     NSV_dead_loads2=[NSV_load_names2[0]] #Deadloads of tracks and concrete sleeper
