@@ -145,8 +145,10 @@ for i in range(start,end+1):
     fsu = int(float(data_dict["fsu"][i]))
     esu = float(data_dict["esu"][i])
     # load parameter
-    s=float(data_dict["s"][i])
-    beta=float(data_dict["beta"][i])
+    s1=float(data_dict["s1"][i])
+    beta1=float(data_dict["beta1"][i])
+    s2=float(data_dict["s2"][i])
+    beta2=float(data_dict["beta2"][i])
     
     h_G=float(data_dict["h_G"][i])
     gamma_E=float(data_dict["gamma_E"][i])
@@ -378,23 +380,32 @@ for i in range(start,end+1):
     ## Live Loads
     #Normalspurverkehr Load generator 
     y_A_Biegung=(L_el/2) #-(m.cos(m.radians(beta))*1500)
-    NSV_load_names=Normalspurbahnverkehr_load_generator(mdl,name='Gleis1', l_Pl=L_el, h_Pl=t_p, s=s*b1, beta=beta,
+    NSV_load_names1=Normalspurbahnverkehr_load_generator(mdl,name='Gleis1', l_Pl=L_el, h_Pl=t_p, s=s1, beta=beta1,
                                                          q_Gl=q_Gl, b_Bs=b_Bs, h_Strich=550.0,h_GL=160, h_w=h_w, Q_k=Q_k, y_A=y_A_Biegung,m=4650,
                                                          gamma_G=1.35, gamma_Q=1.45, verbalise=True)
 
-    NSV_dead_loads=[NSV_load_names[0]] #Deadloads of tracks and concrete sleeper
-    NSV_live_loads=NSV_load_names[1:] # Life load of trains
+    NSV_dead_loads1=[NSV_load_names1[0]] #Deadloads of tracks and concrete sleeper
+    NSV_live_loads1=NSV_load_names1[1:] # Life load of trains
+
+    NSV_load_names2=Normalspurbahnverkehr_load_generator(mdl,name='Gleis2', l_Pl=L_el, h_Pl=t_p, s=s2, beta=beta2,
+                                                         q_Gl=q_Gl, b_Bs=b_Bs, h_Strich=550.0,h_GL=160, h_w=h_w, Q_k=Q_k, y_A=y_A_Biegung,m=4650,
+                                                         gamma_G=1.35, gamma_Q=1.45, verbalise=True)
+
+    NSV_dead_loads2=[NSV_load_names2[0]] #Deadloads of tracks and concrete sleeper
+    NSV_live_loads2=NSV_load_names2[1:] # Life load of trains
 
     
     # Earth pressure load generator (resulting from live load) on wall 1 (only one sided)
-    earth_pressure_liveload = earthPressure_liveload_generator(structure=mdl, s=s*b1, h_w=h_w, t_p=t_p, phi_k=phi_k, gamma_Q=1.45)
+    earth_pressure_liveload1 = earthPressure_liveload_generator(structure=mdl, s=s1, h_w=h_w, t_p=t_p, name="track1", phi_k=phi_k, gamma_Q=1.45)
+
+    earth_pressure_liveload2 = earthPressure_liveload_generator(structure=mdl, s=s2, h_w=h_w, t_p=t_p, name="track2", phi_k=phi_k, gamma_Q=1.45)
 
     
 
     #Load Steps
     dead_loads=['load_gravity']
-    superimposed_dead_loads = earth_pressure_gravel_load+ earth_pressure_backfill_load + NSV_dead_loads #+gravel_pressure 
-    live_loads = NSV_live_loads +earth_pressure_liveload
+    superimposed_dead_loads = earth_pressure_gravel_load+ earth_pressure_backfill_load + NSV_dead_loads1 + NSV_dead_loads2 #+gravel_pressure 
+    live_loads = NSV_live_loads1 + earth_pressure_liveload1 + NSV_live_loads2 + earth_pressure_liveload2
     
     
     mdl.add([
@@ -412,15 +423,19 @@ for i in range(start,end+1):
     # Run analyses
     # ------------------------------------------------------------------------------
     # ------------------------------------------------------------------------------
-    mdl.analyse_and_extract(software='ansys_sel',license='student', fields=[ 'u','eps','sig_sr', 'sf', 's'], lstep = ['step_4'])  #'sf', 's'
+    mdl.analyse_and_extract(software='ansys_sel',license='research', fields=[ 'u','eps','sig_sr', 'sf', 's'], lstep = ['step_4'])  #'sf', 's'
     
     print('Analysis Finished')
     
-    
-    
-    # Plot Results
+    # Run verification
     # ------------------------------------------------------------------------------
     # ------------------------------------------------------------------------------
+    mdl.calc_verifications(step='step_4',field='shear',D_max=32, tau_cd=1.4)
+    
+    
+#    # Plot Results
+#    # ------------------------------------------------------------------------------
+#    # ------------------------------------------------------------------------------
     step='step_4'
     #plot displacement
     rhino.plot_data(mdl, lstep=step, field='uz', scale=300.0, cbar_size=1, source='CMMUsermat') # Ploten der Verformungen uz (Resultate: Knoten)
@@ -436,22 +451,22 @@ for i in range(start,end+1):
     rhino.plot_data(mdl, lstep=step, field='sm2', cbar_size=1, source='CMMUsermat') # Ploten der verallgemeinerten Spannungen (Resultate: Elementmitte)
     rhino.plot_data(mdl, lstep=step, field='sm3', cbar_size=1, source='CMMUsermat') # Ploten der verallgemeinerten Spannungen (Resultate: Elementmitte)
     #plot concrete stresses
-#    rhino.plot_principal_stresses(mdl, step=step, shell_layer='top', scale=10**1, numeric='no', values='3') # Hauptspannungen 3 top (Resultate: Gauspunkte)
-#    rhino.plot_principal_stresses(mdl, step=step, shell_layer='top', scale=10**1, numeric='no', values='1') # Hauptspannungen 1 top (Resultate: Gauspunkte)
-#    rhino.plot_principal_stresses(mdl, step=step, shell_layer='bot', scale=10**1, numeric='no', values='3') # Hauptspannungen 3 bot (Resultate: Gauspunkte)
-#    rhino.plot_principal_stresses(mdl, step=step, shell_layer='bot', scale=10**1, numeric='no', values='1') # Hauptspannungen 1 bot (Resultate: Gauspunkte)
+    rhino.plot_principal_stresses(mdl, step=step, shell_layer='top', scale=10**1, numeric='no', values='3') # Hauptspannungen 3 top (Resultate: Gauspunkte)
+    rhino.plot_principal_stresses(mdl, step=step, shell_layer='top', scale=10**1, numeric='no', values='1') # Hauptspannungen 1 top (Resultate: Gauspunkte)
+    rhino.plot_principal_stresses(mdl, step=step, shell_layer='bot', scale=10**1, numeric='no', values='3') # Hauptspannungen 3 bot (Resultate: Gauspunkte)
+    rhino.plot_principal_stresses(mdl, step=step, shell_layer='bot', scale=10**1, numeric='no', values='1') # Hauptspannungen 1 bot (Resultate: Gauspunkte)
     # plot concrete strains
-#    rhino.plot_principal_strains(mdl, step=step, shell_layer='top', scale=10**5, numeric='no', values='3') # Hauptverzerrungen 3 top (Resultate: Gauspunkte)
-#    rhino.plot_principal_strains(mdl, step=step, shell_layer='top', scale=10**5, numeric='no', values='1') # Hauptverzerrungen 1 top (Resultate: Gauspunkte)
-#    rhino.plot_principal_strains(mdl, step=step, shell_layer='bot', scale=10**5, numeric='no', values='3') # Hauptverzerrungen 3 bot (Resultate: Gauspunkte)
-#    rhino.plot_principal_strains(mdl, step=step, shell_layer='bot', scale=10**5, numeric='no', values='1') # Hauptverzerrungen 1 bot (Resultate: Gauspunkte)
+    rhino.plot_principal_strains(mdl, step=step, shell_layer='top', scale=10**5, numeric='no', values='3') # Hauptverzerrungen 3 top (Resultate: Gauspunkte)
+    rhino.plot_principal_strains(mdl, step=step, shell_layer='top', scale=10**5, numeric='no', values='1') # Hauptverzerrungen 1 top (Resultate: Gauspunkte)
+    rhino.plot_principal_strains(mdl, step=step, shell_layer='bot', scale=10**5, numeric='no', values='3') # Hauptverzerrungen 3 bot (Resultate: Gauspunkte)
+    rhino.plot_principal_strains(mdl, step=step, shell_layer='bot', scale=10**5, numeric='no', values='1') # Hauptverzerrungen 1 bot (Resultate: Gauspunkte)
     #plot steel stresses
     rhino.plot_steel_stresses(mdl, step=step, Reinf_layer='RL_1', scale=1.3, numeric='no') # Stahlspannungen am Riss 1. Bewehrungslage (Resultate: Gauspunkte)
     rhino.plot_steel_stresses(mdl, step=step, Reinf_layer='RL_2', scale=1.3, numeric='no') # Stahlspannungen am Riss 2. Bewehrungslage (Resultate: Gauspunkte)
     rhino.plot_steel_stresses(mdl, step=step, Reinf_layer='RL_3', scale=1.3, numeric='no') # Stahlspannungen am Riss 3. Bewehrungslage (Resultate: Gauspunkte)
     rhino.plot_steel_stresses(mdl, step=step, Reinf_layer='RL_4', scale=1.3, numeric='no') # Stahlspannungen am Riss 4. Bewehrungslage (Resultate: Gauspunkte)
     #plot shear
-    rhino.plot_principal_shear(mdl, step=step, field='shear', cbar_size=0.5, scale=4, numeric='no', shear_verification='yes', D_max=32, tau_cd=1.4) # (Resultate: Gauspunkte)
+    rhino.plot_principal_shear(mdl, step=step, field='shear', cbar_size=0.5, scale=4, numeric='yes', shear_verification='yes', D_max=32, tau_cd=1.4) # (Resultate: Gauspunkte)
         
      
 
