@@ -155,10 +155,16 @@ def earthPressure_liveload_generator(structure, s, beta, L, h_w, t_p, phi_k,gamm
         Distance between origin and middle axis of the track 
     h_w : float
         Wall hight [mm]
+    beta : float
+        Angle between global y-axis and track axis [Degree], should be in range[-90,90]
+    L : float
+        Span of the frame bridge [mm]
     t_p : float
         Deck Slab Thickness [mm]
     phi_k: int
         ..[Degree] (e.g. 30)
+    direction: str
+        Direction in which the earthPressure should act (also decids on which wall it is applied) (e.g. 'positive')
     name : str
         Name of the track (e.g. "Track1")
     verbalise: bool
@@ -168,7 +174,7 @@ def earthPressure_liveload_generator(structure, s, beta, L, h_w, t_p, phi_k,gamm
     Returns
     ----------
     List[str]
-        List of load names, which were generated within this function: ['earthPressure_backfill']
+        List of load names, which were generated within this function
 
     Limitations/Specification
     -------------
@@ -192,7 +198,7 @@ def earthPressure_liveload_generator(structure, s, beta, L, h_w, t_p, phi_k,gamm
     load_name_list=[]
 
     #Case 1: apply earth pressure in positive y direction (wall 2)
-    if direction in  [ 'positive', 'all']:
+    if direction in  [ 'positive', 'all', 'both']:
             # Create layer
         #-------------------------------------------------------
         # define layer name ( and later name of area load)
@@ -240,12 +246,13 @@ def earthPressure_liveload_generator(structure, s, beta, L, h_w, t_p, phi_k,gamm
         #-------------------------------------------------------
         # determine which elements are loaded
         loaded_element_numbers=area_load_generator_elements(structure, layer_name)
+        print('pos: ',loaded_element_numbers)
 
         #define load name
         if name == None:
-            load_name='earthPressure_liveLoad_neg'
+            load_name='earthPressure_liveLoad_pos'
         else:
-            load_name='earthPressure_liveLoad_neg_{}'.format(name)
+            load_name='earthPressure_liveLoad_pos_{}'.format(name)
 
         load_name_list.append(load_name) #save load name to be returned
 
@@ -254,7 +261,7 @@ def earthPressure_liveload_generator(structure, s, beta, L, h_w, t_p, phi_k,gamm
 
 
     #Case 2: apply earth pressure in positive y direction (wall 2)
-    if direction in  [ 'negative', 'all']:
+    if direction in  [ 'negative', 'all', 'both']:
             # Create layer
         #-------------------------------------------------------
         # define layer name ( and later name of area load)
@@ -301,6 +308,7 @@ def earthPressure_liveload_generator(structure, s, beta, L, h_w, t_p, phi_k,gamm
         
         # determine which elements are loaded
         loaded_element_numbers=area_load_generator_elements(structure, layer_name)
+        print('neg: ',loaded_element_numbers)
         
         #define load name
         if name == None:
@@ -315,7 +323,7 @@ def earthPressure_liveload_generator(structure, s, beta, L, h_w, t_p, phi_k,gamm
 
 
     # Case C: invalid input for direction
-    if direction not in  ['positive', 'negative', 'all']:
+    if direction not in  ['positive', 'negative', 'all', 'both']:
         raise ValueError('The direction defined is not valid. Please choose between "postive", "negative, or "all".')
 
 
