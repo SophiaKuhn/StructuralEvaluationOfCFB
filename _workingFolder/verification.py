@@ -368,9 +368,9 @@ def concrete_bending_verification_stresses(structure=None, results = None, step=
 
     #define calculation of eta_stresses
     def calculate_eta_sig_ifNeg(row):
-        # Extracting the values for fcc_eff_top and sig_x_top from the row
-        x = row[0]
-        y = row[1]
+        # Extracting the values for fcc_eff_top/bot and sig_x_top/bot from the row
+        x = row.iloc[0]
+        y = row.iloc[1]
         # Performing the division if sig is less than 0
         if y < 0:
             return -x / y  # fcc_eff/sig
@@ -418,6 +418,69 @@ def concrete_bending_verification_stresses(structure=None, results = None, step=
         raise Exception("Only return types dict and df are implemented. Define one of these types.")
     
     return res
+
+def concrete_shear_verification(structure = None, results=None, step=None, return_type='dict', verbalise=True ):
+    '''
+    Performs the shear verification for the structure.
+    Calculating the minimum eta_v of the structure and evaluating the critical position.
+
+    Parameters:
+    structure: structure object
+        a structure object defined after see function ....
+    results: dict
+        Contains the analysis results for each evaluation step.
+    step: string
+        the name of the analysis step (e.g. "step_4")
+    return type: string
+        the type of the return value. Possible return types are "dict" and "df". The default is dict.
+    verbalise: bool
+        Flag that defines weather the function should print progress information (if set to True) 
+        or should run without printing any progress information (if set to False).
+
+    
+    Returns:
+    res: dict or pandas dataframe
+        The function returns a dict with the shear verification results 
+        The dict contains the following keys: 'eta_min_shear', 'x_c_shear', 'y_c_shear', 'z_c_shear', 'Location_c_shear', 'GP_count_shear'
+    '''
+
+    # if not results but the structure is given we first extract the results dict from the structure pkl file
+    if results == None:
+        if structure == None:
+            raise Exception("You have not provided a structure of results. You have to provide at one!")
+        
+        results = structure.results
+        if verbalise:
+            print('The structure was converted to results dict')
+    
+    # get shear verification already perfromed on element level
+    eta_v_dict=results[step]['element']['eta_v']
+    eps_06d_loc_decisive_dict=results[step]['element']['eps_06d_loc_decisive']
+    centroid_dict=results[step]['element']['centroid']
+
+    # Find the element with the minimum eta_v value (disregard Nones)
+    eta_v_dict_filtered = {key: value for key, value in eta_v_dict.items() if value is not None} # Filter out None values
+    min_element = min(eta_v_dict_filtered, key=eta_v_dict_filtered.get)
+    eta_min_shear = eta_v_dict_filtered[min_element]
+    element_count = sum(1 for value in eta_v_dict_filtered.values() if value < 1) # Count values less than 1 in the filtered dictionary
+    eps_06d_loc_decisive=eps_06d_loc_decisive_dict[min_element]
+    centroid=centroid_dict[min_element]
+    x=centroid[0]
+    y=centroid[1]
+    z=centroid[2]
+
+    # write a dict with results and print
+    res_concrete={'eta_min_shear' : [eta_min_shear], 'x_c_shear' : [x], 'y_c_shear' : [y], 'z_c_shear' : [z], 'Location_c_shear':[eps_06d_loc_decisive], 'element_count_shear': [element_count]}
+
+    if return_type=='dict':
+        res=res_concrete
+    elif return_type=='df':
+        res= pd.DataFrame(res_concrete)
+    else:
+        raise Exception("Only return types dict and df are implemented. Define one of these types.")
+    
+    return res
+    
 
 
 
@@ -517,26 +580,32 @@ def calc_eta(idx_s, start_id, end_id, step, extract_from ='results', folder_name
 
                     res_steel=pd.DataFrame({'eta_min_s' : [0.], 'x_s' : [None], 'y_s' : [None], 'z_s' : [None], 'Location_s':None, 'GP_count_s': [None]})
                     res_concrete=pd.DataFrame({'eta_min_c' : [0.], 'x_c' : [None], 'y_c' : [None], 'z_c' : [None], 'Location_c':[None], 'GP_count_c': [None]})
+                    res_conc_shear=pd.DataFrame({'eta_min_shear' : [0.]})
+
                     if with_eta_stresses:
                         res_concrete_stresses=pd.DataFrame({'eta_min_c_stresses' : [0.], 'x_c_stresses' : [None], 'y_c_stresses' : [None], 'z_c_stresses' : [None], 'Location_c_stresses':[None]})
 
                     if with_eta_stresses:
-                        df_c_s=pd.concat([res_steel,res_concrete, res_concrete_stresses], axis=1)
+                        df_c_s=pd.concat([res_steel,res_concrete, res_conc_shear, res_concrete_stresses], axis=1)
                     else:
-                        df_c_s=pd.concat([res_steel,res_concrete], axis=1)
+                        df_c_s=pd.concat([res_steel,res_concrete, res_conc_shear], axis=1)
+
                     df_c_s['ID']=ID
 
                 else:
                     # extract max values from the analysis results of this structre 
                     df_steel=steel_bending_verification(results=results, step=step, return_type='df',verbalise=verbalise)
                     df_conc=concrete_bending_verification(results=results, step=step, return_type='df', verbalise=verbalise)
-                    if with_eta_stresses:
-                        df_conc_stresses=concrete_bending_verification_stresses(results=results, step=step, return_type='df',verbalise=verbalise)
+                    df_conc_shear=concrete_shear_verification(results=results, step=step, return_type='df', verbalise=verbalise)
 
                     if with_eta_stresses:
-                        df_c_s=pd.concat([df_steel,df_conc, df_conc_stresses], axis=1)
+                        df_conc_stresses=concrete_bending_verification_stresses(results=results, step=step, return_type='df',verbalise=verbalise)
+                    
+                    if with_eta_stresses:
+                        df_c_s=pd.concat([df_steel,df_conc, df_conc_shear, df_conc_stresses], axis=1)
                     else:
-                        df_c_s=pd.concat([df_steel,df_conc], axis=1)
+                        df_c_s=pd.concat([df_steel,df_conc, df_conc_shear], axis=1)
+
                     df_c_s['ID']=ID
             else:
                 raise Exception("The results/ structure file exists however the defined step is empty. No analysis results can be extracted.")
@@ -605,6 +674,50 @@ def get_results(idx_s, ID, step=None, extract_from ='results', folder_name='CFBD
 
 
     return results
+
+def get_structure(idx_s, ID, folder_name='CFBData', extract_from='pickle', verbalise=True):
+    '''
+    This function loads the structure object with the ID from the sampling batch idx_s. If a step is provided only the results dict for that step is returned.
+
+    Parameters:
+    idx_s: integer
+        Index of sampling. File identifier.
+    ID: integer
+        Structure ID.
+    folder_name: string
+        The name of the folder where the results are located in
+    verbalise: bool
+        Flag that defines weather the function should print progress information (if set to True) 
+        or should run without printing any progress information (if set to False).
+
+    
+    Returns:
+    structure: obj
+        returns the impotred structure object.
+    '''
+        
+    #construct path
+    current_directory = os.getcwd()
+    filepath=current_directory+'\\CFBData\\{}_Batch\\{}_{}_CFB\\{}_{}_structure.pkl'.format(idx_s,idx_s,ID,idx_s,ID)
+    if verbalise:
+        print('filepath: ',filepath)
+
+    # Load results dict form json file
+    if os.path.exists(filepath):
+        print('Path found.')
+        with open(filepath, 'rb') as file:
+            structure = pickle.load(file)
+            if verbalise:
+                print('Structure imported')
+
+             
+    else: 
+        if verbalise:
+            print('Path not found.')
+        structure=None
+
+
+    return structure
 
 
 
