@@ -141,7 +141,7 @@ def earthPressure_backfill_generator(structure, elements, h_w, t_p, h_G, gamma_E
     return ['earthPressure_backfill']
 
 
-def earthPressure_liveload_generator(structure, s, h_w, t_p, phi_k,gamma_Q=1, name=None, verbalise=True):
+def earthPressure_liveload_generator(structure, s, beta, L, h_w, t_p, phi_k,gamma_Q=1, direction='positive', name=None, verbalise=True):
     
     '''
     This function calculates the earth pressure area load magnitude that results from the live load of a track
@@ -174,77 +174,153 @@ def earthPressure_liveload_generator(structure, s, h_w, t_p, phi_k,gamma_Q=1, na
     -------------
     - So far the earth pressure live load is only applied to one side (at x=0), so far this function is not able to apply earth pressure on both wall sides
     - Has to be used after the the Normalspurbahnverkehr_load_generator function was executed (as this function uses the created Mittelachse)
-    # TODO if Mittelachse noch nicht exist create one, coder von Normalspur function hier einfuegen?
     '''
 
-    # Create layer
-    #-------------------------------------------------------
-    # define layer name ( and later name of area load)
-    if name == None:
-        layer_name = "EarthPressure_liveLoad_area"
-    else:
-        layer_name = "EarthPressure_liveLoad_area_{}".format(name)
-
-
-    # create the new layer
-    if rs.IsLayer(layer_name):
-        rs.PurgeLayer(layer_name)
-        scriptcontext.doc.Layers.Add(layer_name, System.Drawing.Color.Green)
-    else:
-        scriptcontext.doc.Layers.Add(layer_name, System.Drawing.Color.Green)
-    
-    # set layer to current active layer
-    rs.CurrentLayer(layer_name)
-
-    # Generate polyline of area load
-    #-------------------------------------------------------
-    # Startpunkt der Mittelachse (Annahme: Globaler Nullpunkt immer bei x=0,y=0,z=0)
-    point_start_x=s
-    point_start_y=0
-
-    #calculation of corner point coordinates in wall 1
-    # y is always 0
-    ep_width=3800 #[mm] # From PAIngB B1.3 Page 72 (SBB specific norm)
-    x_A= point_start_x +ep_width/2
-    z_A = -t_p
-    x_B= point_start_x +ep_width/2
-    z_B = -h_w-t_p
-    x_C= point_start_x -ep_width/2
-    z_C = -h_w-t_p
-    x_D= point_start_x -ep_width/2
-    z_D = -t_p
-
-    # creation of polyline, and add to active layer
-    rs.AddPolyline([(x_A,0,z_A),(x_B,0,z_B),(x_C,0,z_C),(x_D,0,z_D), (x_A,0,z_A)])
-
-
-    # calculate coordinates of corner points in wall 2
-    # TODO Erddruck infolge vertikaler Bahnverkehrslasten ist einseitig oder beidseitig des Rahmens anzunehmen. (laut PAIngB B1.3 Page 72)
-    # TODO bis jetzt nur einseitig aufgebracht (zweiseitig ist bis jetzt nicht moeglich mit dieser funktion)
-
-
-
-
-    # Calculate magnitude and add area load
+    # Calculate magnitude 
     #-------------------------------------------------------
     # calculate magnitude of area load
     q = 0.052 #[N/mm2] = 52[kN/m2] From PAIngB B1.3 Page 72 (SBB specific norm)
     # z = 700 [mm] #From PAIngB B1.3 Page 72
-    #TODO checken ob das so richtig ist mit dem If sentence (vgl bericht Hero)
+    #TODO checken ob das so richtig ist mit dem If sentence (vgl bericht Hero), need z?
     # if h_g > z:
     #     z=h_g
     Ko = 1-m.sin(m.radians(phi_k))
     p = gamma_Q*(Ko * q) #[N/mm2]
 
-    # determine which elements are loaded
-    loaded_element_numbers=area_load_generator_elements(structure, layer_name)
 
-    # add load
-    if name == None:
-        load_name='earthPressure_liveLoad'
-    else:
-        load_name='earthPressure_liveLoad_{}'.format(name)
-    structure.add(AreaLoad(load_name, elements=loaded_element_numbers,x=0,y=0,z=p,axes ='local')) # postive z-dir is inwards here
+    #Initialize
+    load_name_list=[]
+
+    #Case 1: apply earth pressure in positive y direction (wall 2)
+    if direction in  [ 'positive', 'all']:
+            # Create layer
+        #-------------------------------------------------------
+        # define layer name ( and later name of area load)
+        if name == None:
+            layer_name = "EarthPressure_liveLoad_area_pos"
+        else:
+            layer_name = "{}_EarthPressure_liveLoad_area_pos".format(name)
+
+
+
+        # create the new layer
+        if rs.IsLayer(layer_name):
+            rs.PurgeLayer(layer_name)
+            scriptcontext.doc.Layers.Add(layer_name, System.Drawing.Color.Green)
+        else:
+            scriptcontext.doc.Layers.Add(layer_name, System.Drawing.Color.Green)
+        
+        # set layer to current active layer
+        rs.CurrentLayer(layer_name)
+
+        # Generate polyline of area load
+        #-------------------------------------------------------
+        # Startpunkt der Mittelachse (Annahme: Globaler Nullpunkt immer bei x=0,y=0,z=0)
+        point_start_x=s
+        point_start_y=0
+
+        #calculation of corner point coordinates in wall 1
+        # y is always 0
+        ep_width=3800 #[mm] # From PAIngB B1.3 Page 72 (SBB specific norm)
+        x_A= point_start_x +ep_width/2
+        z_A = -t_p
+        x_B= point_start_x +ep_width/2
+        z_B = -h_w-t_p
+        x_C= point_start_x -ep_width/2
+        z_C = -h_w-t_p
+        x_D= point_start_x -ep_width/2
+        z_D = -t_p
+
+        # creation of polyline, and add to active layer
+        rs.AddPolyline([(x_A,0,z_A),(x_B,0,z_B),(x_C,0,z_C),(x_D,0,z_D), (x_A,0,z_A)])
+
+
+
+        # Add area load to loaded elements
+        #-------------------------------------------------------
+        # determine which elements are loaded
+        loaded_element_numbers=area_load_generator_elements(structure, layer_name)
+
+        #define load name
+        if name == None:
+            load_name='earthPressure_liveLoad_neg'
+        else:
+            load_name='earthPressure_liveLoad_neg_{}'.format(name)
+
+        load_name_list.append(load_name) #save load name to be returned
+
+        # add load
+        structure.add(AreaLoad(load_name, elements=loaded_element_numbers,x=0,y=0,z=p,axes ='local')) # postive z-dir is inwards here
+
+
+    #Case 2: apply earth pressure in positive y direction (wall 2)
+    if direction in  [ 'negative', 'all']:
+            # Create layer
+        #-------------------------------------------------------
+        # define layer name ( and later name of area load)
+        if name == None:
+            layer_name = "EarthPressure_liveLoad_area_neg"
+        else:
+            layer_name = "{}_EarthPressure_liveLoad_area_neg".format(name)
+
+
+        # create the new layer
+        if rs.IsLayer(layer_name):
+            rs.PurgeLayer(layer_name)
+            scriptcontext.doc.Layers.Add(layer_name, System.Drawing.Color.Green)
+        else:
+            scriptcontext.doc.Layers.Add(layer_name, System.Drawing.Color.Green)
+        
+        # set layer to current active layer
+        rs.CurrentLayer(layer_name)
+
+        # Generate polyline of area load
+        #-------------------------------------------------------
+        # Startpunkt der Mittelachse auf wall 1 (Annahme: Globaler Nullpunkt immer bei x=0,y=0,z=0)
+        point_start_x=s
+        # Endpoint der Mittelchse on wall 2
+        point_start_x_w2 = point_start_x + m.tan(m.radians(beta))*L
+
+
+        #calculation of corner point coordinates in wall 2
+        ep_width=3800 #[mm] # From PAIngB B1.3 Page 72 (SBB specific norm)
+        x_A= point_start_x_w2 +ep_width/2
+        z_A = -t_p
+        x_B= point_start_x_w2 +ep_width/2
+        z_B = -h_w-t_p
+        x_C= point_start_x_w2 -ep_width/2
+        z_C = -h_w-t_p
+        x_D= point_start_x_w2 -ep_width/2
+        z_D = -t_p
+
+        rs.AddPolyline([(x_A,L,z_A),(x_B,L,z_B),(x_C,L,z_C),(x_D,L,z_D), (x_A,L,z_A)])
+    
+
+        # Add area load to loaded elements
+        #-------------------------------------------------------
+        
+        # determine which elements are loaded
+        loaded_element_numbers=area_load_generator_elements(structure, layer_name)
+        
+        #define load name
+        if name == None:
+            load_name='earthPressure_liveLoad_neg'
+        else:
+            load_name='earthPressure_liveLoad_neg_{}'.format(name)
+
+        load_name_list.append(load_name) #save load name to be returned
+
+        # add load
+        structure.add(AreaLoad(load_name, elements=loaded_element_numbers,x=0,y=0,z=p,axes ='local')) # postive z-dir is inwards here
+
+
+    # Case C: invalid input for direction
+    if direction not in  ['positive', 'negative', 'all']:
+        raise ValueError('The direction defined is not valid. Please choose between "postive", "negative, or "all".')
+
+
+
+
 
     # set default layer back to active layer
     rs.CurrentLayer('Default')
@@ -253,7 +329,7 @@ def earthPressure_liveload_generator(structure, s, h_w, t_p, phi_k,gamma_Q=1, na
     if verbalise:
         print('The earth pressure resulting from the live load is calculated to be: ', p, ' N/mm2 ;',p*1000, ' kN/m2'  )
 
-    #return of name of generated area load
-    return [load_name]
+    #return of name of generated area load(s) as a list
+    return load_name_list
 
 

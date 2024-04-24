@@ -71,7 +71,7 @@ import math as m
 
 # define sampling iteration (= Batch number)
 #!!!!INPUT HERE!!!!!
-idx_s = 150
+idx_s = 1
 
 
 
@@ -387,7 +387,8 @@ for i in range(start,end+1):
 
     
     # Earth pressure load generator (resulting from live load) on wall 1 (only one sided)
-    earth_pressure_liveload = earthPressure_liveload_generator(structure=mdl, s=s*b1, h_w=h_w, t_p=t_p, phi_k=phi_k, gamma_Q=1.45)
+    earth_pressure_liveload = earthPressure_liveload_generator(structure=mdl, s=s*b1,beta=beta, L=L_el, h_w=h_w, t_p=t_p, 
+                                                                phi_k=phi_k, direction='negative', gamma_Q=30, name='Gleis1')
 
     
 
@@ -427,9 +428,9 @@ for i in range(start,end+1):
 #    # ------------------------------------------------------------------------------
     step='step_4'
 #    #plot displacement
-#    rhino.plot_data(mdl, lstep=step, field='uz', scale=300.0, cbar_size=1, source='CMMUsermat') # Ploten der Verformungen uz (Resultate: Knoten)
-#    rhino.plot_data(mdl, lstep=step, field='ux', cbar_size=1, source='CMMUsermat') # Ploten der Verformungen ux (Resultate: Knoten)
-#    rhino.plot_data(mdl, lstep=step, field='uy', cbar_size=1, source='CMMUsermat') # Ploten der Verformungen uy (Resultate: Knoten)
+    rhino.plot_data(mdl, lstep=step, field='uz', scale=200.0, cbar_size=1, source='CMMUsermat') # Ploten der Verformungen uz (Resultate: Knoten)
+    rhino.plot_data(mdl, lstep=step, field='ux', cbar_size=1, source='CMMUsermat') # Ploten der Verformungen ux (Resultate: Knoten)
+    rhino.plot_data(mdl, lstep=step, field='uy', cbar_size=1, source='CMMUsermat') # Ploten der Verformungen uy (Resultate: Knoten)
 #    #plot internal forces
 #    rhino.plot_data(mdl, lstep=step, field='sf1', cbar_size=1, source='CMMUsermat') # Ploten der verallgemeinerten Spannungen (Resultate: Elementmitte)
 #    rhino.plot_data(mdl, lstep=step, field='sf2', cbar_size=1, source='CMMUsermat') # Ploten der verallgemeinerten Spannungen (Resultate: Elementmitte)
