@@ -71,7 +71,7 @@ import math as m
 
 # define sampling iteration (= Batch number)
 #!!!!INPUT HERE!!!!!
-idx_s = 91
+idx_s = 99
 
 
 
@@ -255,7 +255,7 @@ for i in range(start,end+1):
     # -- define corresponding material  --
     #TODO oo and uu einlesen
     geo={'R_Rohr':-1, 'rho':0.0000025, 'oo':oo, 'uu':uu}
-    concrete={'beton':2, 'fcc':fcc, 'vc':0, 'ecu':ecu, 'k_E':10000, 'theta_b0':2, 'theta_b1':1, 'k_riss':0, 'Entfestigung':0, 'lambdaTS':0.67, 'srmx':1, 'srmy':1, 'Begrenzung':2, 'KritQ':0, 'winkelD':45, 'k_vr':1, 'fswy':500}
+    concrete={'beton':2, 'fcc':fcc, 'vc':0, 'ecu':ecu, 'k_E':35000, 'theta_b0':2, 'theta_b1':1, 'k_riss':0, 'Entfestigung':0, 'lambdaTS':0.67, 'srmx':1, 'srmy':1, 'Begrenzung':2, 'KritQ':0, 'winkelD':45, 'k_vr':1, 'fswy':500}
     reinf_1L={'stahl':1,'zm':2,'fsy':fsy,'fsu':fsu,'esu':esu,'esv':0.02,'Es':200000,'ka':-1,'kb':-1,'kc':-1,'as':as1,'dm':d1,'psi':90}
     reinf_2L={'stahl':1,'zm':2,'fsy':fsy,'fsu':fsu,'esu':esu,'esv':0.02,'Es':200000,'ka':-1,'kb':-1,'kc':-1,'as':as2,'dm':d2,'psi':0}
     reinf_3L={'stahl':1,'zm':2,'fsy':fsy,'fsu':fsu,'esu':esu,'esv':0.02,'Es':200000,'ka':-1,'kb':-1,'kc':-1,'as':as3,'dm':d3,'psi':0}
@@ -400,8 +400,6 @@ for i in range(start,end+1):
 
     earth_pressure_liveload2 = earthPressure_liveload_generator(structure=mdl, s=s2, h_w=h_w, t_p=t_p, name="track2", phi_k=phi_k, gamma_Q=1.45)
 
-    
-
     #Load Steps
     dead_loads=['load_gravity']
     superimposed_dead_loads = earth_pressure_gravel_load+ earth_pressure_backfill_load + NSV_dead_loads1 + NSV_dead_loads2 #+gravel_pressure 
@@ -427,17 +425,16 @@ for i in range(start,end+1):
     # mdl.analyse_and_extract(software='ansys_sel',license='research', fields=[ 'u','eps','sig_sr', 'sf', 's'], lstep = ['step_4'])  #'sf', 's'
     
     print('Analysis Finished')
-
+    
     # Run verification
     # ------------------------------------------------------------------------------
     # ------------------------------------------------------------------------------
     mdl.calc_verifications(step='step_4',field='shear',D_max=32, tau_cd=1.4)
     
     
-    
-    # Plot Results
-    # ------------------------------------------------------------------------------
-    # ------------------------------------------------------------------------------
+#    # Plot Results
+#    # ------------------------------------------------------------------------------
+#    # ------------------------------------------------------------------------------
     step='step_4'
     #plot displacement
     rhino.plot_data(mdl, lstep=step, field='uz', scale=300.0, cbar_size=1, source='CMMUsermat') # Ploten der Verformungen uz (Resultate: Knoten)
@@ -468,7 +465,7 @@ for i in range(start,end+1):
     rhino.plot_steel_stresses(mdl, step=step, Reinf_layer='RL_3', scale=1.3, numeric='no') # Stahlspannungen am Riss 3. Bewehrungslage (Resultate: Gauspunkte)
     rhino.plot_steel_stresses(mdl, step=step, Reinf_layer='RL_4', scale=1.3, numeric='no') # Stahlspannungen am Riss 4. Bewehrungslage (Resultate: Gauspunkte)
     #plot shear
-    rhino.plot_principal_shear(mdl, step=step, field='shear', cbar_size=0.5, scale=4, numeric='no', shear_verification='yes', D_max=32, tau_cd=1.4) # (Resultate: Gauspunkte)
+    rhino.plot_principal_shear(mdl, step=step, field='shear', cbar_size=0.5, scale=4, numeric='yes', shear_verification='yes', D_max=32, tau_cd=1.4) # (Resultate: Gauspunkte)
         
      
 
