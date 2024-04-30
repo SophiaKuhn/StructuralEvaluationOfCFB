@@ -54,7 +54,7 @@ from export import delete_all, joinMeshes_inShellLayers #rhino functions
 from export import save_to_pickle,save_to_json # #export functions
 
 #from strucenglib.prepost_functions.earthPressure_load_generator import earthPressure_calculator,earthPressure_load_generator
-from earthPressure_load_generator import earthPressure_backfill_generator, earthPressure_liveload_generator, earthPressure_gravel_generator #,earthPressure_load_generator
+from earthPressure_load_generator_LoadGenerationUpdate import earthPressure_backfill_generator, earthPressure_liveload_generator, earthPressure_gravel_generator #,earthPressure_load_generator
 
 import rhinoscriptsyntax as rs
 import time
@@ -71,7 +71,7 @@ import math as m
 
 # define sampling iteration (= Batch number)
 #!!!!INPUT HERE!!!!!
-idx_s = 99
+idx_s = 3
 
 
 
@@ -129,6 +129,7 @@ for i in range(start,end+1):
     # Import/get parameter for current iteration
     # --01_global parameter (from sampler csv --> imported as dict)--
     #geometric parameter
+    L = float(data_dict["L"][i])
     h_w = float(data_dict["h_w"][i])
     b1 = float(data_dict["b1"][i])
     t_p = float(data_dict["t_p"][i])
@@ -255,7 +256,7 @@ for i in range(start,end+1):
     # -- define corresponding material  --
     #TODO oo and uu einlesen
     geo={'R_Rohr':-1, 'rho':0.0000025, 'oo':oo, 'uu':uu}
-    concrete={'beton':2, 'fcc':fcc, 'vc':0, 'ecu':ecu, 'k_E':35000, 'theta_b0':2, 'theta_b1':1, 'k_riss':0, 'Entfestigung':0, 'lambdaTS':0.67, 'srmx':1, 'srmy':1, 'Begrenzung':2, 'KritQ':0, 'winkelD':45, 'k_vr':1, 'fswy':500}
+    concrete={'beton':2, 'fcc':fcc, 'vc':0, 'ecu':ecu, 'k_E':10000, 'theta_b0':2, 'theta_b1':1, 'k_riss':0, 'Entfestigung':0, 'lambdaTS':0.67, 'srmx':1, 'srmy':1, 'Begrenzung':2, 'KritQ':0, 'winkelD':45, 'k_vr':1, 'fswy':500}
     reinf_1L={'stahl':1,'zm':2,'fsy':fsy,'fsu':fsu,'esu':esu,'esv':0.02,'Es':200000,'ka':-1,'kb':-1,'kc':-1,'as':as1,'dm':d1,'psi':90}
     reinf_2L={'stahl':1,'zm':2,'fsy':fsy,'fsu':fsu,'esu':esu,'esv':0.02,'Es':200000,'ka':-1,'kb':-1,'kc':-1,'as':as2,'dm':d2,'psi':0}
     reinf_3L={'stahl':1,'zm':2,'fsy':fsy,'fsu':fsu,'esu':esu,'esv':0.02,'Es':200000,'ka':-1,'kb':-1,'kc':-1,'as':as3,'dm':d3,'psi':0}
@@ -380,25 +381,26 @@ for i in range(start,end+1):
     ## Live Loads
     #Normalspurverkehr Load generator 
     y_A_Biegung=(L_el/2) #-(m.cos(m.radians(beta))*1500)
+
     NSV_load_names1=Normalspurbahnverkehr_load_generator(mdl,name='Gleis1', l_Pl=L_el, h_Pl=t_p, s=s1, beta=beta1,
                                                          q_Gl=q_Gl, b_Bs=b_Bs, h_Strich=550.0,h_GL=160, h_w=h_w, Q_k=Q_k, y_A=y_A_Biegung,m=4650,
-                                                         gamma_G=1.35, gamma_Q=1.45, verbalise=True)
+                                                         gamma_G=1.35, gamma_Q=1.45, direction='all', verbalise=True)
 
     NSV_dead_loads1=[NSV_load_names1[0]] #Deadloads of tracks and concrete sleeper
     NSV_live_loads1=NSV_load_names1[1:] # Life load of trains
 
     NSV_load_names2=Normalspurbahnverkehr_load_generator(mdl,name='Gleis2', l_Pl=L_el, h_Pl=t_p, s=s2, beta=beta2,
                                                          q_Gl=q_Gl, b_Bs=b_Bs, h_Strich=550.0,h_GL=160, h_w=h_w, Q_k=Q_k, y_A=y_A_Biegung,m=4650,
-                                                         gamma_G=1.35, gamma_Q=1.45, verbalise=True)
+                                                         gamma_G=1.35, gamma_Q=1.45, direction='all', verbalise=True)
 
     NSV_dead_loads2=[NSV_load_names2[0]] #Deadloads of tracks and concrete sleeper
     NSV_live_loads2=NSV_load_names2[1:] # Life load of trains
 
     
     # Earth pressure load generator (resulting from live load) on wall 1 (only one sided)
-    earth_pressure_liveload1 = earthPressure_liveload_generator(structure=mdl, s=s1, h_w=h_w, t_p=t_p, name="track1", phi_k=phi_k, gamma_Q=1.45)
+    earth_pressure_liveload1 = earthPressure_liveload_generator(structure=mdl, s=s1, beta=beta1, L=L, h_w=h_w, t_p=t_p, phi_k=phi_k, gamma_Q=1.45, direction='negative', name="track1")
 
-    earth_pressure_liveload2 = earthPressure_liveload_generator(structure=mdl, s=s2, h_w=h_w, t_p=t_p, name="track2", phi_k=phi_k, gamma_Q=1.45)
+    earth_pressure_liveload2 = earthPressure_liveload_generator(structure=mdl, s=s2, beta=beta2, L=L, h_w=h_w, t_p=t_p, phi_k=phi_k, gamma_Q=1.45, direction='negative', name="track2")
 
     #Load Steps
     dead_loads=['load_gravity']
