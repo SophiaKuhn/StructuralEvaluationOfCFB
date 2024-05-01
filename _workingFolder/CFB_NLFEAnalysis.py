@@ -72,7 +72,7 @@ import math as m
 
 # define sampling iteration (= Batch number)
 #!!!!INPUT HERE!!!!!
-idx_s = 1
+idx_s = 2
 
 
 
