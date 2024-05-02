@@ -492,7 +492,7 @@ def concrete_shear_verification(structure = None, results=None, step=None, retur
             #TODO later verifiy that that was the correct dv selected? or ok like this? (konservative side)
             
 
-            #get t_w and L from corresponding x.csv file
+            #get t_w, t_p, L, h_w from corresponding x.csv file
             current_directory = os.getcwd()
             folder_path = os.path.join(current_directory, folder_name)
             csv_x_path=folder_path+'\\{}_Batch\\{}_{}_CFB\\x.csv'.format(idx_s,idx_s,ID)
@@ -500,6 +500,8 @@ def concrete_shear_verification(structure = None, results=None, step=None, retur
             df_x_series = df_x.squeeze() 
             L=float(df_x_series['L'])
             t_w=float(df_x_series['t_w'])
+            t_p=float(df_x_series['t_p'])
+            h_w=float(df_x_series['h_w'])
 
             #calculate x cut-off distances
             y_min=t_w/2 + dv_min/2
@@ -515,9 +517,43 @@ def concrete_shear_verification(structure = None, results=None, step=None, retur
 
 
             #Find element with minimum eta_v value that lies in that reduced area
-            min_element = min(eta_v_dict_filtered_2, key=eta_v_dict_filtered.get)
-            eta_min_shear = eta_v_dict_filtered_2[min_element]
-            element_count = sum(1 for value in eta_v_dict_filtered_2.values() if value < 1) # Count values less than 1 in the filtered dictionary
+            min_element_deck = min(eta_v_dict_filtered_2, key=eta_v_dict_filtered_2.get)
+            eta_min_shear_deck = eta_v_dict_filtered_2[min_element_deck]
+
+
+            #calculate x cut-off distances
+            z_max= -t_p-dv_min/2
+            z_min= - h_w +dv_min/2
+            print('zmin', z_min)
+            print('zmax', z_max)
+
+            #filter out all cetroids that are outside of this distance range
+            eta_v_dict_filtered_3 = {key: eta_v_dict_filtered[key] 
+                                     for key in centroid_dict 
+                                     if z_min <= centroid_dict[key][2] <= z_max and key in eta_v_dict_filtered}
+
+
+
+            #Find element with minimum eta_v value that lies in that reduced area
+            min_element_walls = min(eta_v_dict_filtered_3, key=eta_v_dict_filtered_3.get)
+            eta_min_shear_walls = eta_v_dict_filtered_3[min_element_walls]
+
+
+
+            if eta_min_shear_walls < eta_min_shear_deck:
+                eta_min_shear=eta_min_shear_walls
+                eta_dict=eta_v_dict_filtered_3
+                min_element=min_element_walls
+            else:
+                eta_min_shear=eta_min_shear_deck
+                eta_dict=eta_v_dict_filtered_2
+                min_element=min_element_deck
+
+
+
+
+
+            element_count = sum(1 for value in eta_dict.values() if value < 1) # Count values less than 1 in the filtered dictionary
             eps_06d_loc_decisive=eps_06d_loc_decisive_dict[min_element]
             centroid=centroid_dict[min_element]
             x=centroid[0]
