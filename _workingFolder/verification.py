@@ -419,7 +419,7 @@ def concrete_bending_verification_stresses(structure=None, results = None, step=
     
     return res
 
-def concrete_shear_verification(structure = None, results=None, step=None, return_type='dict', verbalise=True ):
+def concrete_shear_verification(structure = None, results=None, step=None, return_type='dict', verbalise=True, verify_reduced_area=True, interpolation=True, idx_s=None, ID=None, folder_name=None):
     '''
     Performs the shear verification for the structure.
     Calculating the minimum eta_v of the structure and evaluating the critical position.
@@ -436,6 +436,14 @@ def concrete_shear_verification(structure = None, results=None, step=None, retur
     verbalise: bool
         Flag that defines weather the function should print progress information (if set to True) 
         or should run without printing any progress information (if set to False).
+    verify_reduced_area: bool
+        Additional to the global minimum of eta_shear also return the minimum and location in the reduced deck slab area (+/-dv/2)
+    interpolation: bool
+        Calculate the interpolated eta values between the two elements centeroids that are closest to the dv/2 line. And then return minumum and location.
+    idx_s: integer
+        Batch Number (to identify bridge which is calulated)
+    ID: integer
+        ID Number (to identify bridge which is calulated)
 
     
     Returns:
@@ -458,7 +466,7 @@ def concrete_shear_verification(structure = None, results=None, step=None, retur
     eps_06d_loc_decisive_dict=results[step]['element']['eps_06d_loc_decisive']
     centroid_dict=results[step]['element']['centroid']
 
-    # Find the element with the minimum eta_v value (disregard Nones)
+    # Find the element with the minimum eta_v value (disregard None values)
     eta_v_dict_filtered = {key: value for key, value in eta_v_dict.items() if value is not None} # Filter out None values
     min_element = min(eta_v_dict_filtered, key=eta_v_dict_filtered.get)
     eta_min_shear = eta_v_dict_filtered[min_element]
@@ -472,6 +480,56 @@ def concrete_shear_verification(structure = None, results=None, step=None, retur
     # write a dict with results and print
     res_concrete={'eta_min_shear' : [eta_min_shear], 'x_c_shear' : [x], 'y_c_shear' : [y], 'z_c_shear' : [z], 'Location_c_shear':[eps_06d_loc_decisive], 'element_count_shear': [element_count]}
 
+
+    # Find minimum eta_v value in reduced deck slab area (+/-dv/2)
+    if verify_reduced_area == True:
+
+            #calculate dv (for relevant location) TODO see implementation in compas fea verification script, or save in verfication script directly?
+            dv=results[step]['element']['dv']
+            dv_min_element= min(dv,key=dv.get)
+            dv_min = dv[dv_min_element] #get minimum dv
+
+            #TODO later verifiy that that was the correct dv selected? or ok like this? (konservative side)
+            
+
+            #get t_w and L from corresponding x.csv file
+            current_directory = os.getcwd()
+            folder_path = os.path.join(current_directory, folder_name)
+            csv_x_path=folder_path+'\\{}_Batch\\{}_{}_CFB\\x.csv'.format(idx_s,idx_s,ID)
+            df_x = pd.read_csv(csv_x_path, delimiter=',', header=None, index_col=0)
+            df_x_series = df_x.squeeze() 
+            L=float(df_x_series['L'])
+            t_w=float(df_x_series['t_w'])
+
+            #calculate x cut-off distances
+            y_min=t_w/2 + dv_min/2
+            #print('ymin', y_min)
+            y_max=L - t_w -dv_min/2
+            #print('ymax', y_max)
+
+            #filter out all cetroids that are outside of this distance range
+            eta_v_dict_filtered_2 = {key: eta_v_dict_filtered[key] 
+                                     for key in centroid_dict 
+                                     if y_min <= centroid_dict[key][1] <= y_max and key in eta_v_dict_filtered}
+
+
+
+            #Find element with minimum eta_v value that lies in that reduced area
+            min_element = min(eta_v_dict_filtered_2, key=eta_v_dict_filtered.get)
+            eta_min_shear = eta_v_dict_filtered_2[min_element]
+            element_count = sum(1 for value in eta_v_dict_filtered_2.values() if value < 1) # Count values less than 1 in the filtered dictionary
+            eps_06d_loc_decisive=eps_06d_loc_decisive_dict[min_element]
+            centroid=centroid_dict[min_element]
+            x=centroid[0]
+            y=centroid[1]
+            z=centroid[2]
+
+
+            #Add results to already existing res_concrete dict
+            #also save dv (but this is saved indirectly as x value here?)
+            res_concrete.update({'eta_min_shear_reduced' : [eta_min_shear], 'x_c_shear_reduced' : [x], 'y_c_shear_reduced' : [y], 'z_c_shear_reduced' : [z], 'Location_c_shear_reduced':[eps_06d_loc_decisive], 'element_count_shear_reduced': [element_count]})
+
+    
     if return_type=='dict':
         res=res_concrete
     elif return_type=='df':
@@ -485,7 +543,7 @@ def concrete_shear_verification(structure = None, results=None, step=None, retur
 
 
 
-def calc_eta(idx_s, start_id, end_id, step, extract_from ='results', folder_name='CFBData', with_eta_stresses=False, verbalise=True):
+def calc_eta(idx_s, start_id, end_id, step, extract_from ='results', folder_name='CFBData', with_eta_stresses=False, verify_reduced_area=True, interpolation=True, verbalise=True):
 
     '''
     This function iterates from start_id to end_id. Opens the corresponding file. 
@@ -507,9 +565,14 @@ def calc_eta(idx_s, start_id, end_id, step, extract_from ='results', folder_name
         The name of the folder where the results are located in
     with_eta_stresses: bool
         Flag that defines weather the eta_stresses should also be caluclated for concrete in bending
+    verify_reduced_area: bool
+        Additional to the global minimum of eta_shear also return the minimum and location in the reduced deck slab area (+/-dv/2)
+    interpolation: bool
+        Calculate the interpolated eta values between the two elements centeroids that are closest to the dv/2 line. And then return minumum and location.
     verbalise: bool
         Flag that defines weather the function should print progress information (if set to True) 
         or should run without printing any progress information (if set to False).
+
 
     
     Returns:
@@ -580,7 +643,7 @@ def calc_eta(idx_s, start_id, end_id, step, extract_from ='results', folder_name
 
                     res_steel=pd.DataFrame({'eta_min_s' : [0.], 'x_s' : [None], 'y_s' : [None], 'z_s' : [None], 'Location_s':None, 'GP_count_s': [None]})
                     res_concrete=pd.DataFrame({'eta_min_c' : [0.], 'x_c' : [None], 'y_c' : [None], 'z_c' : [None], 'Location_c':[None], 'GP_count_c': [None]})
-                    res_conc_shear=pd.DataFrame({'eta_min_shear' : [0.]})
+                    res_conc_shear=pd.DataFrame({'eta_min_shear' : [0.], 'x_c_shear' : [None], 'y_c_shear' : [None], 'z_c_shear' : [None], 'Location_c_shear':[None], 'element_count_shear': [None]})
 
                     if with_eta_stresses:
                         res_concrete_stresses=pd.DataFrame({'eta_min_c_stresses' : [0.], 'x_c_stresses' : [None], 'y_c_stresses' : [None], 'z_c_stresses' : [None], 'Location_c_stresses':[None]})
@@ -596,7 +659,7 @@ def calc_eta(idx_s, start_id, end_id, step, extract_from ='results', folder_name
                     # extract max values from the analysis results of this structre 
                     df_steel=steel_bending_verification(results=results, step=step, return_type='df',verbalise=verbalise)
                     df_conc=concrete_bending_verification(results=results, step=step, return_type='df', verbalise=verbalise)
-                    df_conc_shear=concrete_shear_verification(results=results, step=step, return_type='df', verbalise=verbalise)
+                    df_conc_shear=concrete_shear_verification(results=results, step=step, return_type='df', verbalise=verbalise, verify_reduced_area=verify_reduced_area, interpolation=interpolation, idx_s=idx_s, ID=ID,folder_name=folder_name)
 
                     if with_eta_stresses:
                         df_conc_stresses=concrete_bending_verification_stresses(results=results, step=step, return_type='df',verbalise=verbalise)
@@ -614,6 +677,8 @@ def calc_eta(idx_s, start_id, end_id, step, extract_from ='results', folder_name
                 df_res=df_c_s
             else:
                 df_res=pd.concat([df_res,df_c_s])
+
+        #TODO Add an y csv file in the unterordner (so wie das x auch existiert)
 
 
         # if no structure pickle or result json file exists (due to an error (not divergence) or simply wrong path)
