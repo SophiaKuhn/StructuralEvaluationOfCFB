@@ -54,7 +54,7 @@ from export import delete_all, joinMeshes_inShellLayers #rhino functions
 from export import save_to_pickle,save_to_json # #export functions
 
 #from strucenglib.prepost_functions.earthPressure_load_generator import earthPressure_calculator,earthPressure_load_generator
-from earthPressure_load_generator_LoadGenerationUpdate import earthPressure_backfill_generator, earthPressure_liveload_generator, earthPressure_gravel_generator #,earthPressure_load_generator
+from earthPressure_load_generator import earthPressure_backfill_generator, earthPressure_liveload_generator, earthPressure_gravel_generator #,earthPressure_load_generator
 
 import rhinoscriptsyntax as rs
 import time
@@ -71,7 +71,7 @@ import math as m
 
 # define sampling iteration (= Batch number)
 #!!!!INPUT HERE!!!!!
-idx_s = 3
+idx_s = 5
 
 
 
@@ -129,7 +129,6 @@ for i in range(start,end+1):
     # Import/get parameter for current iteration
     # --01_global parameter (from sampler csv --> imported as dict)--
     #geometric parameter
-    L = float(data_dict["L"][i])
     h_w = float(data_dict["h_w"][i])
     b1 = float(data_dict["b1"][i])
     t_p = float(data_dict["t_p"][i])
@@ -398,9 +397,9 @@ for i in range(start,end+1):
 
     
     # Earth pressure load generator (resulting from live load) on wall 1 (only one sided)
-    earth_pressure_liveload1 = earthPressure_liveload_generator(structure=mdl, s=s1, beta=beta1, L=L, h_w=h_w, t_p=t_p, phi_k=phi_k, gamma_Q=1.45, direction='negative', name="track1")
+    earth_pressure_liveload1 = earthPressure_liveload_generator(structure=mdl, s=s1, beta=beta1, L=L_el, h_w=h_w, t_p=t_p, phi_k=phi_k, gamma_Q=1.45, direction='negative', name="track1")
 
-    earth_pressure_liveload2 = earthPressure_liveload_generator(structure=mdl, s=s2, beta=beta2, L=L, h_w=h_w, t_p=t_p, phi_k=phi_k, gamma_Q=1.45, direction='negative', name="track2")
+    earth_pressure_liveload2 = earthPressure_liveload_generator(structure=mdl, s=s2, beta=beta2, L=L_el, h_w=h_w, t_p=t_p, phi_k=phi_k, gamma_Q=1.45, direction='negative', name="track2")
 
     #Load Steps
     dead_loads=['load_gravity']
