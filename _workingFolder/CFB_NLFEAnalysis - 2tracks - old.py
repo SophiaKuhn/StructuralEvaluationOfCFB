@@ -44,7 +44,8 @@ from strucenglib.prepost_functions import plot_nr_elem
 from strucenglib.prepost_functions import plot_nr_nodes
 from strucenglib.prepost_functions import area_load_generator_elements
 from strucenglib.prepost_functions import Normalspurbahnverkehr_load_generator
-from strucenglib.prepost_functions import earthPressure_backfill_generator, earthPressure_liveload_generator, earthPressure_gravel_generator
+from strucenglib.prepost_functions import verification
+from strucenglib.sandwichmodel import sandwichmodel_main as SMM
 
 
 #New Functions
@@ -52,6 +53,8 @@ from export import read_csv_to_dict,extract_numbers_from_string #utility functio
 from export import delete_all, joinMeshes_inShellLayers #rhino functions
 from export import save_to_pickle,save_to_json # #export functions
 
+#from strucenglib.prepost_functions.earthPressure_load_generator import earthPressure_calculator,earthPressure_load_generator
+from earthPressure_load_generator import earthPressure_backfill_generator, earthPressure_liveload_generator, earthPressure_gravel_generator #,earthPressure_load_generator
 
 import rhinoscriptsyntax as rs
 import time
@@ -68,7 +71,7 @@ import math as m
 
 # define sampling iteration (= Batch number)
 #!!!!INPUT HERE!!!!!
-idx_s = 1
+idx_s = 5
 
 
 
@@ -377,6 +380,7 @@ for i in range(start,end+1):
     ## Live Loads
     #Normalspurverkehr Load generator 
     y_A_Biegung=(L_el/2) #-(m.cos(m.radians(beta))*1500)
+
     NSV_load_names1=Normalspurbahnverkehr_load_generator(mdl,name='Gleis1', l_Pl=L_el, h_Pl=t_p, s=s1, beta=beta1,
                                                          q_Gl=q_Gl, b_Bs=b_Bs, h_Strich=h_G,h_GL=160, h_w=h_w, Q_k=Q_k, y_A=y_A_Biegung,m=4650,
                                                          gamma_G=1.35, gamma_Q=1.45, direction='all', verbalise=True)
@@ -429,9 +433,9 @@ for i in range(start,end+1):
     mdl.calc_verifications(step='step_4',field='shear',D_max=32, tau_cd=1.4)
     
     
-    # Plot Results
-    # ------------------------------------------------------------------------------
-    # ------------------------------------------------------------------------------
+#    # Plot Results
+#    # ------------------------------------------------------------------------------
+#    # ------------------------------------------------------------------------------
     step='step_4'
     #plot displacement
     rhino.plot_data(mdl, lstep=step, field='uz', scale=300.0, cbar_size=1, source='CMMUsermat') # Ploten der Verformungen uz (Resultate: Knoten)
