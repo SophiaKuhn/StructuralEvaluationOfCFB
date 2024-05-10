@@ -68,7 +68,7 @@ import math as m
 
 # define sampling iteration (= Batch number)
 #!!!!INPUT HERE!!!!!
-idx_s = 73
+idx_s = 35
 
 
 
