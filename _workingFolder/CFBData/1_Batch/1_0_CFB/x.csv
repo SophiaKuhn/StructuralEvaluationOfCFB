@@ -38,7 +38,7 @@ b_sec1_b1,0.33
 b_sec2_b1,0.33
 h_S1_3,0.33
 h_S7_9,0.33
-mesh_size_factor,1.0
+mesh_size_factor,3.0
 b2,9720.0
 b_sec1_b2,0.33
 b_sec2_b2,0.33
