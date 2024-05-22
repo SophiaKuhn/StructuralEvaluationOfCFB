@@ -67,18 +67,69 @@ def hist_matrix(df, n_cols=4, bins=20, color='gray', edgecolor='darkgray'):
 
 ### from here downward code in progress...!
 #sampler
+#concept idea:
+#TODO
+# have libary of parameter sample spaces here (for documentation purposes, better that in the notebook I think)
+# 
     
-parameterStudie1={'Ranges' :{'L': (2000.,18000.),
-                                    'b1' : (3000.,20000.),
-                                    't_p': (200.,1200.),
+parameterStudie1={'Ranges' :{
+                            #geometry parameter
+                            'L': (2000.,18000.), #span [mm]
+                            'b1' : (3000.,20000.), # witdh of wall(s) [mm]
+                            't_p': (200.,1200.), # Deck slab (plate) thickness [mm]
+                            't_w':(200., 1200.),   # wall thickness [mm]
+                            'h_w' :(2000.,5000.), #wall height [mm]
+                            # reinforcement parameter
+                            'd1_plate' :(10.,30.), # Reinforcement Diameter of all plate sections - Layer 1 (lower outer layer) [mm]
+                            'd4_plate' :(10.,30.), #Reinforcement Diameter of all plate sections - Layer 4 (upper outer layer) [mm]
+                            'd2_plate' :(10.,30.), # Reinforcement Diameter of all plate sections - Layer 2 (lower middle layer) [mm]
+                            's_plate' :(100.,500.), # Reinforcement spacing of all plate sections [mm]
+                            'd1_walls' :(10.,30.), # Reinforcement Diameter of all plate sections - Layer 1 (inner layer) [mm]
+                            'd4_walls' :(10.,30.), # Reinforcement Diameter of all walls sections - Layer 4 (outer layer) [mm]
+                            's_walls' :(100.,500.), # Reinforcement spacing of all walls sections [mm]
+                            # material parameter
+                            'fcc' :(25.,50.), # Concrete compressive strength
+                            # loading parameter
+                            's' :(0.1,0.9),
+                            'beta' :(-50,50),
+                            'h_G' :(300,1500),
+                            },
 
-                                    't_w':(200., 1200.),   # Wall Thickness [mm]
-                                    'h_w' :(2000.,5000.), 
-                                    },
-                'Constants' : {'fsy': 390,
-                                        'oo' : 30,
-                                        'd3_plate': 12
-                                    }
+                'Constants' : {
+                                #geometry parameter
+                                #'b2': b1, #Width of wall 2 is kept equal to width of wall 1 for this study
+                                'alpha_l': 90, # Plate Angle [Degree]
+                                'h_v': [0] , # Hight of Voute  [mm]
+                                'l_v': [0], # Length of Voute  [mm]
+                                # reinforcement parameter
+                                'oo' : 30, #upper reinforcement cover [mm],
+                                'uu' : 30, #lower reinforcement cover [mm]
+                                'd3_plate': 12, # Reinforcement Diameter of all plate sections - Layer 3 (upper middle layer) [mm]
+                                'd3_walls': 12, # Reinforcement Diameter of all walls sections - Layer 3 (outer middle layer) [mm]
+                                'd2_walls': 12, # Reinforcement Diameter of all walls sections - Layer 2 (inner middle layer) [mm]
+
+                                # material parameter
+                                'fsy': 390, # Reinforcement steel yield strength
+                                'fsu_fac': 1.08, # Reinforcement steel ultimate strength factor
+                                'esu': 0.045, # ultimate reinforcement strain [-]
+
+                                # loading parameter
+                                'gamma_E':0.00002, #spez. weight of backfill/gravel [N/mm3]
+                                'phi_k': 30, # friction angle of backfill/gravel [Degree]
+                                'q_Gl': 4.8+1.7, # Load of concrete sleeper (Betonschwelle) and rail track [N/mm]
+                                'b_Bs':2500 , # width of concrete sleeper (Betonschwelle) [mm]
+                                'Q_k':225000, # norminal axle load (dependent on the class, acc. to SIA 269/1 11.2, for D4 = 225 [N])
+
+                                #section geom. parameter                    
+                                'l_sec': [0.33 ], # Proportion of outter plate sections [-]
+                                'b_sec1_b1': [0.33], # Proportion of section 1 (wall 1 side) [-]
+                                'b_sec2_b1': [0.33], # Proportion of section 2 (wall 1 side) [-]
+                                'h_S1_3': [0.33], # Proportion of wall section (upper)
+                                'h_S7_9': [0.33], # Proportion of wall section (lower)
+
+                                #modelling parameter
+                                'mesh_size_factor': [3] # mesh_size_factor (multiplied with minimum of t_p  and t_w)
+                                }
                 }
 
 hero = {'L': 5800,
@@ -123,19 +174,26 @@ class CFBSamplingSpace:
     def __init__(self,variables=None, parameterStudie=1):
         
         self.parameterStudie=parameterStudie
+        self.variables=variables
         
+        # if only a parameter Study is selected
         if variables == None:
             if parameterStudie==1:
                 variables=parameterStudie1['Ranges']
 
             else:
-                raise Exception('Not Implemented')
-        self.variables=variables
+                raise NotImplementedError()
+        
 
-
-        if parameterStudie==1:
-            self.ranges={k: parameterStudie1['Ranges'][k] for k in variables if k in parameterStudie1['Ranges']}
-            self.constants=parameterStudie1['Constants']
+        else:
+            raise NotImplementedError()
+            
+    
+    
+        # # if specific parameter stu
+        # if parameterStudie==1:
+        #     self.ranges={k: parameterStudie1['Ranges'][k] for k in variables if k in parameterStudie1['Ranges']}
+        #     self.constants=parameterStudie1['Constants']
 
         
 
