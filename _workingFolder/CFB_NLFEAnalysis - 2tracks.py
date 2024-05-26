@@ -68,7 +68,7 @@ import math as m
 
 # define sampling iteration (= Batch number)
 #!!!!INPUT HERE!!!!!
-idx_s = 16
+idx_s = 52
 
 
 
@@ -92,7 +92,7 @@ print('n_samples: ',n_samples)
 #-------------
 #--------------------------------------------------------------------------
 #!!!!INPUT HERE!!!!!
-start = 7
+start = 0
 end = 14#n_samples
 for i in range(start,end+1):
     
