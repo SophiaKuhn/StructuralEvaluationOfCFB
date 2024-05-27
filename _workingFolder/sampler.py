@@ -60,7 +60,7 @@ def hist_matrix(df, n_cols=4, bins=20, color='gray', edgecolor='darkgray'):
     for i, column in enumerate(df.columns):
         # Plot histogram on the corresponding subplot
         axes[i].hist(df[column], bins=bins, color=color, edgecolor=edgecolor)  # You can customize the histogram here
-        axes[i].set_title(f'Histogram of {column}')
+        #axes[i].set_title(f'Histogram of {column}')
         axes[i].set_xlabel(column)
         axes[i].set_ylabel('Frequency')
         axes[i].grid(False)  # Optional: Remove grid lines

@@ -524,8 +524,8 @@ def concrete_shear_verification(structure = None, results=None, step=None, retur
             #calculate x cut-off distances
             z_max= -t_p-dv_min/2
             z_min= - h_w +dv_min/2
-            print('zmin', z_min)
-            print('zmax', z_max)
+            # print('zmin', z_min)
+            # print('zmax', z_max)
 
             #filter out all cetroids that are outside of this distance range
             eta_v_dict_filtered_3 = {key: eta_v_dict_filtered[key] 
