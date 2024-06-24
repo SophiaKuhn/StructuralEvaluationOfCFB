@@ -149,23 +149,30 @@ def steel_bending_verification(structure=None, results = None, step=None, return
                         'coor_x_sig_sr_1L':list(results[step]['GP']['coor_x_sig_sr_1L'].values()),
                         'coor_y_sig_sr_1L':list(results[step]['GP']['coor_y_sig_sr_1L'].values()),
                         'coor_z_sig_sr_1L':list(results[step]['GP']['coor_z_sig_sr_1L'].values()),
-               } )
+                        'fsu_1L':list(results[step]['GP']['fsu_1L'].values()),
+                        'fsu_2L':list(results[step]['GP']['fsu_2L'].values()),
+                        'fsu_3L':list(results[step]['GP']['fsu_3L'].values()),
+                        'fsu_4L':list(results[step]['GP']['fsu_4L'].values()),
+               })
 
 
-    #define calculation of eta
-    def calculate_eta_ifPos(x):
-        if x > 0:
-            return 720/x #fsu/sig_sr #720 MPa; N/mm2
-        #TODO: Get fsu from somewhere (when constant, or when different for different elemens -> Marius will provide a fsu value for each sigma value (for each layer one))
-        #TODO: Check for factors that we might need to apply 1.35 to rrgese fsy fsu values??..
+        #define calculation of eta
+    def calculate_eta_ifPos(row):
+        #Extracting the values for fcc_eff_top/bot and sig_x_top/bot from the row
+        fsu = row.iloc[0]
+        sig_sr = row.iloc[1]
+        if sig_sr > 0:
+            return fsu/sig_sr #fsu/sig_sr #MPa; N/mm2..
         else:
             return None
+        
+
     
     # Calculate eta for for each GP an top and bot, for directions 1 and 2 (--> 4 times per GP) 
-    df_steel['eta_1']=df_steel['sig_sr_1L'].apply(calculate_eta_ifPos)
-    df_steel['eta_2']=df_steel['sig_sr_2L'].apply(calculate_eta_ifPos)
-    df_steel['eta_3']=df_steel['sig_sr_3L'].apply(calculate_eta_ifPos)
-    df_steel['eta_4']=df_steel['sig_sr_4L'].apply(calculate_eta_ifPos)
+    df_steel['eta_1']=df_steel[['fsu_1L','sig_sr_1L']].apply(calculate_eta_ifPos,axis=1)
+    df_steel['eta_2']=df_steel[['fsu_2L','sig_sr_2L']].apply(calculate_eta_ifPos,axis=1)
+    df_steel['eta_3']=df_steel[['fsu_3L','sig_sr_3L']].apply(calculate_eta_ifPos,axis=1)
+    df_steel['eta_4']=df_steel[['fsu_4L','sig_sr_4L']].apply(calculate_eta_ifPos,axis=1)
 
     
     if verbalise:
@@ -207,111 +214,7 @@ def steel_bending_verification(structure=None, results = None, step=None, return
 
 
 
-def steel_bending_verification_old(structure=None, results = None, step=None, return_type='dict', verbalise=True):
 
-    '''
-    This function evaluates the structure results with respect to reinforcement bending. 
-    It caluclates eta based on the ration between the fsu and the stress in the individual reinforcement (sig_sr).
-
-    Parameters:
-    structure: structure object
-        a structure object defined after see function ....
-    results: dict
-        Contains the analysis results for each evaluation step.
-    step: string
-        the name of the analysis step (e.g. "step_4")
-    return type: string
-        the type of the return value. Possible return types are dict and df. The default is dict.
-    verbalise: bool
-        Flag that defines weather the function should print progress information (if set to True) 
-        or should run without printing any progress information (if set to False).
-
-    
-    Returns:
-    res: dict or pandas dataframe
-        The function returns a dict with the verification results 
-        The dict contains the following keys: 'eta_min_s', 'x_s', 'y_s', 'z_s', 'Location_s', 'GP_count_s'
-    '''
-    
-    # if not results but the structure is given we first extract the results dict from the structure pkl file
-    if results == None:
-        if structure==None:
-            raise Exception("You have not provided a structure of results. You have to provide at one!")
-
-        results = structure.results
-        if verbalise:
-            print('The structure was converted to results dict')
-
-    # extract and calculate steel bending results for a structure
-    df_steel = pd.DataFrame({'sig_sr_1L_x':list(results[step]['GP']['sig_sr_1L_x'].values()),
-                        'sig_sr_1L_y':list(results[step]['GP']['sig_sr_1L_y'].values()),
-                        'sig_sr_2L_x':list(results[step]['GP']['sig_sr_2L_x'].values()),
-                        'sig_sr_2L_y':list(results[step]['GP']['sig_sr_2L_y'].values()),
-                        'sig_sr_3L_x':list(results[step]['GP']['sig_sr_3L_x'].values()),
-                        'sig_sr_3L_y':list(results[step]['GP']['sig_sr_3L_y'].values()),
-                        'sig_sr_4L_x':list(results[step]['GP']['sig_sr_4L_x'].values()),
-                        'sig_sr_4L_y':list(results[step]['GP']['sig_sr_4L_y'].values()),
-                        'coor_x_sig_sr_1L':list(results[step]['GP']['coor_x_sig_sr_1L'].values()),
-                        'coor_y_sig_sr_1L':list(results[step]['GP']['coor_y_sig_sr_1L'].values()),
-                        'coor_z_sig_sr_1L':list(results[step]['GP']['coor_z_sig_sr_1L'].values()),
-               } )
-
-
-    #define calculation of eta
-    def calculate_eta_ifPos(x):
-        if x > 0:
-            return 720/x #fsu/sig_sr #720 MPa; N/mm2
-        #TODO: Get fsu from somewhere (when constant, or when different for different elemens -> Marius will provide a fsu value for each sigma value (for each layer one))
-        #TODO: Check for factors that we might need to apply 1.35 to rrgese fsy fsu values??..
-        else:
-            return None
-    
-    # Calculate eta for for each GP an top and bot, for directions 1 and 2 (--> 4 times per GP) 
-    df_steel['eta_1_x']=df_steel['sig_sr_1L_x'].apply(calculate_eta_ifPos)
-    df_steel['eta_1_y']=df_steel['sig_sr_1L_y'].apply(calculate_eta_ifPos)
-    df_steel['eta_2_x']=df_steel['sig_sr_2L_x'].apply(calculate_eta_ifPos)
-    df_steel['eta_2_y']=df_steel['sig_sr_2L_y'].apply(calculate_eta_ifPos)
-    df_steel['eta_3_x']=df_steel['sig_sr_3L_x'].apply(calculate_eta_ifPos)
-    df_steel['eta_3_y']=df_steel['sig_sr_3L_y'].apply(calculate_eta_ifPos)
-    df_steel['eta_4_x']=df_steel['sig_sr_4L_x'].apply(calculate_eta_ifPos)
-    df_steel['eta_4_y']=df_steel['sig_sr_4L_y'].apply(calculate_eta_ifPos)
-    
-    if verbalise:
-        #print number of elements
-        print('Number of elements: ',len(df_steel['eta_1_x'])/4)
-
-    # get minimum eta fpr each Gaus Point
-    df_steel['eta_min_GP'] = df_steel[['eta_1_x', 'eta_1_y', 'eta_2_x', 'eta_2_y', 'eta_3_x', 'eta_3_y', 'eta_4_x', 'eta_4_y']].min(axis=1)
-    # Get Minimum eta value of structure
-    eta_min_structure = df_steel['eta_min_GP'].min()
-
-    # Find the location (columnname) of the minimum eta value
-    location = df_steel[['eta_1_x', 'eta_1_y', 'eta_2_x', 'eta_2_y', 'eta_3_x', 'eta_3_y', 'eta_4_x', 'eta_4_y']][df_steel == eta_min_structure].stack().index.tolist()[0][1]
-
-    #TODO: include that it is tracked which is the minimum layer 1,2,3 or 4 (to be also predicted)?
-    # TODO: one could include all coordinates of all layers and save the right z value than the z bvalue is more accurate!
-
-
-    # Getting coordinates of min position
-    idx_eta_min_structure = df_steel['eta_min_GP'].idxmin()
-    x = df_steel.loc[idx_eta_min_structure, 'coor_x_sig_sr_1L']
-    y = df_steel.loc[idx_eta_min_structure, 'coor_y_sig_sr_1L']
-    z = df_steel.loc[idx_eta_min_structure, 'coor_z_sig_sr_1L']
-
-    # Count_ eta values smaller than 1
-    GP_count= df_steel[df_steel['eta_min_GP'] < 1]['eta_min_GP'].count()
-
-
-    # write a dict with results and print
-    res_steel={'eta_min_s' : [eta_min_structure], 'x_s' : [x], 'y_s' : [y], 'z_s' : [z], 'Location_s':[location], 'GP_count_s': [GP_count]}
-    if return_type=='dict':
-        res=res_steel
-    elif return_type=='df':
-        res= pd.DataFrame(res_steel)
-    else:
-        raise Exception("Only return types dict and df are implemented. Define one of these types.")
-
-    return res
 
 def concrete_bending_verification_stresses(structure=None, results = None, step=None, return_type='dict', verbalise=True):
 
