@@ -389,8 +389,9 @@ def concrete_shear_verification(structure = None, results=None, step=None, retur
 
             #calculate dv (for relevant location) TODO see implementation in compas fea verification script, or save in verfication script directly?
             dv=results[step]['element']['dv']
-            dv_min_element= min(dv,key=dv.get)
-            dv_min = dv[dv_min_element] #get minimum dv
+            dv_clean = {k: v for k, v in dv.items() if v is not None}
+            dv_min_element= min(dv_clean,key=dv_clean.get)
+            dv_min = dv_clean[dv_min_element] #get minimum d
 
             #TODO later verifiy that that was the correct dv selected? or ok like this? (konservative side)
             
@@ -412,6 +413,9 @@ def concrete_shear_verification(structure = None, results=None, step=None, retur
             y_max=L - t_w -dv_min/2
             #print('ymax', y_max)
 
+
+            #TODO Error when walls too short or plate too slender (then filtered dict is empty...)
+            #TODO handeling? if empty dict then return nun for shear NW?
             #filter out all cetroids that are outside of this distance range
             eta_v_dict_filtered_2 = {key: eta_v_dict_filtered[key] 
                                      for key in centroid_dict 
@@ -430,6 +434,7 @@ def concrete_shear_verification(structure = None, results=None, step=None, retur
             # print('zmin', z_min)
             # print('zmax', z_max)
 
+            #TODO Error when walls too short or plate too slender (then filtered dict is empty...)
             #filter out all cetroids that are outside of this distance range
             eta_v_dict_filtered_3 = {key: eta_v_dict_filtered[key] 
                                      for key in centroid_dict 
