@@ -1,0 +1,134 @@
+# define a specific sample to be caluclated
+#NEW with added reinforcements according to plannes
+bridge_hero_parameters = {
+    #-----Main Geometric Parameters------
+    # Span [mm]
+    # Source: 2. Objektbeschrieb
+    'L': [5800],
+    # Width [mm]
+    # Source: 4. Modellierung
+    'b1': [9720],
+    # Deck slab (plate) thickness [mm]
+    # Source: 4. Modellierung
+    't_p': [400],
+    # walls thickness [mm]
+    # Source: 4. Modellierung
+    't_w': [400],
+    # wall height [mm]
+    # Source: 4. Modellierung
+    'h_w': [2780],
+    # Plate Angle [Degree]
+    # Don't touch
+    'alpha_l':[90], 
+    # Hight of Voute  [mm]
+    # Don't touch
+    'h_v': [0] , 
+     # Length of Voute  [mm]
+     # Don't touch
+    'l_v': [0], 
+
+
+    #-----Reinforcement Geom. Parameters-----
+    # upper reinforcement cover [mm],
+    # Source: 8.1.2 Nachweis der Plattenquerkraft
+    'oo' : [30],
+    # lower reinforcement cover [mm]
+    # Source: 8.1.2 Nachweis der Plattenquerkraft
+    'uu': [30],
+    # Reinforcement Diameter of all plate sections - Layer 4 (upper outer layer) [mm]
+    # Source: 2. Objektbeschrieb
+    'd4_plate_1_6': [24],
+    'd4_plate_7_9': [14],
+    # Reinforcement Diameter of all plate sections - Layer 3 (upper middle layer) [mm]
+    # Source: 2. Objektbeschrieb
+    'd3_plate': [12],
+    # Reinforcement Diameter of all plate sections - Layer 2 (lower middle layer) [mm]
+    # Source: 2. Objektbeschrieb
+    'd2_plate':[14],
+    # Reinforcement Diameter of all plate sections - Layer 1 (lower outer layer) [mm]
+    # Source: 2. Objektbeschrieb
+    'd1_plate': [24],
+    # Reinforcement spacing of all plate sections [mm]
+    # Source: 2. Objektbeschrieb
+    's_plate': [200],
+    # Reinforcement Diameter of all walls sections - Layer 4 (outer layer) [mm]
+    # Source: 2. Objektbeschrieb
+    'd4_walls_1_3': [24],
+    'd4_walls_4_9': [14],
+    # Reinforcement Diameter of all walls sections - Layer 3 (outer middle layer) [mm]
+    # Source: 2. Objektbeschrieb
+    'd3_walls': [12],
+    # Reinforcement Diameter of all walls sections - Layer 2 (inner middle layer) [mm]
+    # Source: 2. Objektbeschrieb
+    'd2_walls':[12],
+    # Reinforcement Diameter of all plate sections - Layer 1 (inner layer) [mm]
+    # Source: 2. Objektbeschrieb
+    'd1_walls': [14],
+    # Reinforcement spacing of all walls sections [mm]
+    # Source: 2. Objektbeschrieb
+    's_walls': [200],
+
+    #-----Material Parameters -------
+    # Concrete compressive strength
+    # Source: 7. Materialkennwerte
+    'fcc': [28],
+    # Reinforcement steel yield strength
+    # Source: 7. Materialkennwerte
+    'fsy': [390],
+    # Reinforcement steel ultimate strength factor
+    # Source: 7. Materialkennwerte
+    'fsu_fac': [1.046],
+    # ultimate reinforcement strain [-]
+    # Source: 7. Materialkennwerte
+    'esu': [0.045],
+
+    #----- Load Parameter -------
+    # Distance between origin and track middle axis
+    's1': [2250.0],
+    # Angle between global x axis and track axis
+    'beta1': [5.6],
+     # Distance between origin and track middle axis
+    's2': [8270.0],
+    # Angle between global x axis and track axis
+    'beta2': [0],
+    #Gravel layer hight [mm]
+    # Source: Tabelle 5.1
+    'h_G': [1000],
+    #spez. weight of backfill [N/mm3]
+    # Source: Tabelle 5.1
+    'gamma_E':[20e-6],
+    # friction angle [Degree]
+    # Source: Tabelle 5.1
+    'phi_k': [30],
+    # Load of concrete sleeper (Betonschwelle) and rail track [N/mm]
+    # Source: Tabelle 5.1
+    'q_Gl': [4.8+1.7],
+    # width of concrete sleeper (Betonschwelle) [mm]
+    # Source: Tabelle 5.1
+    'b_Bs':[2500] ,
+    # norminal axle load (dependent on the class, acc. to SIA 269/1 11.2, for D4 = 225 [N] )
+    # Don't touch
+    'Q_k':[225000],
+
+
+    # -----section geom. parameter -----
+    # Proportion of outter plate sections [-]
+    # Don't touch
+    'l_sec': [0.25 ],
+    # Proportion of section 1 (wall 1 side) [-]
+    # Don't touch
+    'b_sec1_b1': [0.33],
+    # Proportion of section 2 (wall 1 side) [-]
+    # Don't touch
+    'b_sec2_b1': [0.33],
+    # Proportion of wall section (upper)
+    # Don't touch
+    'h_S1_3': [0.33],
+    # Proportion of wall section (lower)
+    # Don't touch
+    'h_S7_9': [0.33],
+    # mesh_size_factor (multiplied with t_p or t_w respectively)
+    # Do both [1] and [3]
+    'mesh_size_factor': [1] 
+
+    }
