@@ -371,6 +371,7 @@ def concrete_shear_verification(structure = None, results=None, step=None, retur
 
     # Find the element with the minimum eta_v value (disregard None values)
     eta_v_dict_filtered = {key: value for key, value in eta_v_dict.items() if value is not None} # Filter out None values
+
     min_element = min(eta_v_dict_filtered, key=eta_v_dict_filtered.get)
     eta_min_shear = eta_v_dict_filtered[min_element]
     element_count = sum(1 for value in eta_v_dict_filtered.values() if value < 1) # Count values less than 1 in the filtered dictionary
@@ -409,46 +410,56 @@ def concrete_shear_verification(structure = None, results=None, step=None, retur
 
             #calculate x cut-off distances
             y_min=t_w/2 + dv_min/2
-            #print('ymin', y_min)
             y_max=L - t_w -dv_min/2
-            #print('ymax', y_max)
 
 
-            #TODO Error when walls too short or plate too slender (then filtered dict is empty...)
-            #TODO handeling? if empty dict then return nun for shear NW?
             #filter out all cetroids that are outside of this distance range
             eta_v_dict_filtered_2 = {key: eta_v_dict_filtered[key] 
                                      for key in centroid_dict 
                                      if y_min <= centroid_dict[key][1] <= y_max and key in eta_v_dict_filtered}
 
 
-
-            #Find element with minimum eta_v value that lies in that reduced area
-            min_element_deck = min(eta_v_dict_filtered_2, key=eta_v_dict_filtered_2.get)
-            eta_min_shear_deck = eta_v_dict_filtered_2[min_element_deck]
+            if len(eta_v_dict_filtered_2) == 0: 
+                #When no elements are in this reduced ares the dict is empty (this happend when t_p bzw. t_w very large and walls / plate short)
+                eta_min_shear_deck=None
+            else:
+                #Find element with minimum eta_v value that lies in that reduced area - Deck
+                min_element_deck = min(eta_v_dict_filtered_2, key=eta_v_dict_filtered_2.get)
+                eta_min_shear_deck = eta_v_dict_filtered_2[min_element_deck]
 
 
             #calculate x cut-off distances
             z_max= -t_p-dv_min/2
             z_min= - h_w +dv_min/2
-            # print('zmin', z_min)
-            # print('zmax', z_max)
 
-            #TODO Error when walls too short or plate too slender (then filtered dict is empty...)
+
             #filter out all cetroids that are outside of this distance range
             eta_v_dict_filtered_3 = {key: eta_v_dict_filtered[key] 
                                      for key in centroid_dict 
                                      if z_min <= centroid_dict[key][2] <= z_max and key in eta_v_dict_filtered}
 
+            if len(eta_v_dict_filtered_3) == 0:
+                #When no elements are in this reduced ares the dict is empty (this happend when t_p bzw. t_w very large and walls / plate short)
+                eta_min_shear_walls=None
+            else:
+                #Find element with minimum eta_v value that lies in that reduced area - Walls
+                min_element_walls = min(eta_v_dict_filtered_3, key=eta_v_dict_filtered_3.get)
+                eta_min_shear_walls = eta_v_dict_filtered_3[min_element_walls]
 
 
-            #Find element with minimum eta_v value that lies in that reduced area
-            min_element_walls = min(eta_v_dict_filtered_3, key=eta_v_dict_filtered_3.get)
-            eta_min_shear_walls = eta_v_dict_filtered_3[min_element_walls]
-
-
-
-            if eta_min_shear_walls < eta_min_shear_deck:
+            if (eta_min_shear_deck==None) and (eta_min_shear_walls==None):
+                eta_min_shear=None
+                eta_dict=None
+                min_element=None
+            elif eta_min_shear_deck== None:
+                eta_min_shear=eta_min_shear_walls
+                eta_dict=eta_v_dict_filtered_3
+                min_element=min_element_walls
+            elif eta_min_shear_walls== None:
+                eta_min_shear=eta_min_shear_deck
+                eta_dict=eta_v_dict_filtered_2
+                min_element=min_element_deck
+            elif eta_min_shear_walls < eta_min_shear_deck:
                 eta_min_shear=eta_min_shear_walls
                 eta_dict=eta_v_dict_filtered_3
                 min_element=min_element_walls
@@ -460,13 +471,20 @@ def concrete_shear_verification(structure = None, results=None, step=None, retur
 
 
 
+            if eta_min_shear==None:
+                element_count=None
+                eps_06d_loc_decisive=None
+                x=None
+                y=None
+                z=None
 
-            element_count = sum(1 for value in eta_dict.values() if value < 1) # Count values less than 1 in the filtered dictionary
-            eps_06d_loc_decisive=eps_06d_loc_decisive_dict[min_element]
-            centroid=centroid_dict[min_element]
-            x=centroid[0]
-            y=centroid[1]
-            z=centroid[2]
+            else:
+                element_count = sum(1 for value in eta_dict.values() if value < 1) # Count values less than 1 in the filtered dictionary
+                eps_06d_loc_decisive=eps_06d_loc_decisive_dict[min_element]
+                centroid=centroid_dict[min_element]
+                x=centroid[0]
+                y=centroid[1]
+                z=centroid[2]
 
 
             #Add results to already existing res_concrete dict
