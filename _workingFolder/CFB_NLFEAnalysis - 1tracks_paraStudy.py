@@ -68,7 +68,7 @@ import math as m
 
 # define sampling iteration (= Batch number)
 #!!!!INPUT HERE!!!!!
-idx_s = 131
+idx_s = 141
 
 
 
@@ -92,7 +92,7 @@ print('n_samples: ',n_samples)
 #-------------
 #--------------------------------------------------------------------------
 #!!!!INPUT HERE!!!!!
-start = 14
+start = 0
 end =14#n_samples
 for i in range(start,end+1):
     
@@ -415,84 +415,84 @@ for i in range(start,end+1):
 
 
 
-#    # Run analyses
-#    # ------------------------------------------------------------------------------
-#    # ------------------------------------------------------------------------------
-#    # mdl.analyse_and_extract(software='ansys_sel',license="student", fields=[ 'u','eps','sig_sr', 'sf', 's'], lstep = ['step_4'])#'sf', 's'
-#    mdl.analyse_and_extract(software='ansys_sel',license='research', fields=[ 'u','eps','sig_sr', 'sf', 's'], lstep = ['step_4'])  #'sf', 's'
-#    
-#    print('Analysis Finished')
-#    
-#    # Run verification
-#    # ------------------------------------------------------------------------------
-#    # ------------------------------------------------------------------------------
-#    mdl.calc_verifications(step='step_4',field='shear',D_max=32, tau_cd=1.4)
-#    
-#    
-##    Plot Results
-##    ------------------------------------------------------------------------------
-##    ------------------------------------------------------------------------------
-#    # step='step_4'
-#    # #plot displacement
-#    # rhino.plot_data(mdl, lstep=step, field='uz', scale=300.0, cbar_size=1, source='CMMUsermat') # Ploten der Verformungen uz (Resultate: Knoten)
-#    # rhino.plot_data(mdl, lstep=step, field='ux', cbar_size=1, source='CMMUsermat') # Ploten der Verformungen ux (Resultate: Knoten)
-#    # rhino.plot_data(mdl, lstep=step, field='uy', cbar_size=1, source='CMMUsermat') # Ploten der Verformungen uy (Resultate: Knoten)
-#    # #plot internal forces
-#    # rhino.plot_data(mdl, lstep=step, field='sf1', cbar_size=1, source='CMMUsermat') # Ploten der verallgemeinerten Spannungen (Resultate: Elementmitte)
-#    # rhino.plot_data(mdl, lstep=step, field='sf2', cbar_size=1, source='CMMUsermat') # Ploten der verallgemeinerten Spannungen (Resultate: Elementmitte)
-#    # rhino.plot_data(mdl, lstep=step, field='sf3', cbar_size=1, source='CMMUsermat') # Ploten der verallgemeinerten Spannungen (Resultate: Elementmitte)
-#    # rhino.plot_data(mdl, lstep=step, field='sf4', cbar_size=1, source='CMMUsermat') # Ploten der verallgemeinerten Spannungen (Resultate: Elementmitte)
-#    # rhino.plot_data(mdl, lstep=step, field='sf5', cbar_size=1, source='CMMUsermat') # Ploten der verallgemeinerten Spannungen (Resultate: Elementmitte)
-#    # rhino.plot_data(mdl, lstep=step, field='sm1', cbar_size=1, source='CMMUsermat') # Ploten der verallgemeinerten Spannungen (Resultate: Elementmitte)
-#    # rhino.plot_data(mdl, lstep=step, field='sm2', cbar_size=1, source='CMMUsermat') # Ploten der verallgemeinerten Spannungen (Resultate: Elementmitte)
-#    # rhino.plot_data(mdl, lstep=step, field='sm3', cbar_size=1, source='CMMUsermat') # Ploten der verallgemeinerten Spannungen (Resultate: Elementmitte)
-#    # #plot concrete stresses
-#    # rhino.plot_principal_stresses(mdl, step=step, shell_layer='top', scale=10**1, numeric='no', values='3') # Hauptspannungen 3 top (Resultate: Gauspunkte)
-#    # rhino.plot_principal_stresses(mdl, step=step, shell_layer='top', scale=10**1, numeric='no', values='1') # Hauptspannungen 1 top (Resultate: Gauspunkte)
-#    # rhino.plot_principal_stresses(mdl, step=step, shell_layer='bot', scale=10**1, numeric='no', values='3') # Hauptspannungen 3 bot (Resultate: Gauspunkte)
-#    # rhino.plot_principal_stresses(mdl, step=step, shell_layer='bot', scale=10**1, numeric='no', values='1') # Hauptspannungen 1 bot (Resultate: Gauspunkte)
-#    # # plot concrete strains
-#    # rhino.plot_principal_strains(mdl, step=step, shell_layer='top', scale=10**5, numeric='no', values='3') # Hauptverzerrungen 3 top (Resultate: Gauspunkte)
-#    # rhino.plot_principal_strains(mdl, step=step, shell_layer='top', scale=10**5, numeric='no', values='1') # Hauptverzerrungen 1 top (Resultate: Gauspunkte)
-#    # rhino.plot_principal_strains(mdl, step=step, shell_layer='bot', scale=10**5, numeric='no', values='3') # Hauptverzerrungen 3 bot (Resultate: Gauspunkte)
-#    # rhino.plot_principal_strains(mdl, step=step, shell_layer='bot', scale=10**5, numeric='no', values='1') # Hauptverzerrungen 1 bot (Resultate: Gauspunkte)
-#    # #plot steel stresses
-#    # rhino.plot_steel_stresses(mdl, step=step, Reinf_layer='RL_1', scale=1.3, numeric='no') # Stahlspannungen am Riss 1. Bewehrungslage (Resultate: Gauspunkte)
-#    # rhino.plot_steel_stresses(mdl, step=step, Reinf_layer='RL_2', scale=1.3, numeric='no') # Stahlspannungen am Riss 2. Bewehrungslage (Resultate: Gauspunkte)
-#    # rhino.plot_steel_stresses(mdl, step=step, Reinf_layer='RL_3', scale=1.3, numeric='no') # Stahlspannungen am Riss 3. Bewehrungslage (Resultate: Gauspunkte)
-#    # rhino.plot_steel_stresses(mdl, step=step, Reinf_layer='RL_4', scale=1.3, numeric='no') # Stahlspannungen am Riss 4. Bewehrungslage (Resultate: Gauspunkte)
-#    # #plot shear
-#    # rhino.plot_principal_shear(mdl, step=step, field='shear', cbar_size=0.5, scale=4, numeric='yes', shear_verification='yes', D_max=32, tau_cd=1.4) # (Resultate: Gauspunkte)
-#        
-#    
-#
-#
-#    # --------------------------Save Analysis Results -----------------------------------
-#    # Save the Rhino file
-#    subfolder_path=folder_path+'\\{}_Batch\\{}_{}_CFB'.format(idx_s, idx_s, ID)
-#    if not os.path.exists(subfolder_path):
-#        os.makedirs(subfolder_path)
-#
-#    #save structure to a pickle file
-#    file_name='{}_{}_structure'.format(idx_s,ID)
-#    save_to_pickle(obj=mdl, folder_path=subfolder_path, file_name=file_name)
-#    
-#    
-#    # save results dict to a json file
-#    res_dict=mdl.results
-#    file_name='{}_{}_analysisResults'.format(idx_s,ID)
-#    save_to_json(save_dict=res_dict,folder_path=subfolder_path,
-#                    file_name=file_name)
-#    
-#
-#
-##    # save rhino file (with results)
-##    filePath=folder_path+'\\{}_{}_geo_analysis.3dm'.format(idx_s,ID)
-##    opt = r.FileIO.FileWriteOptions()
-##    doc = r.RhinoDoc.ActiveDoc
-##    doc.WriteFile(filePath,opt) #note: also saves DocUserText
-#    
-#    print('Files saved')
-#
-#    
-#
+    # Run analyses
+    # ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
+    # mdl.analyse_and_extract(software='ansys_sel',license="student", fields=[ 'u','eps','sig_sr', 'sf', 's'], lstep = ['step_4'])#'sf', 's'
+    mdl.analyse_and_extract(software='ansys_sel',license='research', fields=[ 'u','eps','sig_sr', 'sf', 's'], lstep = ['step_4'])  #'sf', 's'
+    
+    print('Analysis Finished')
+    
+    # Run verification
+    # ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
+    mdl.calc_verifications(step='step_4',field='shear',D_max=32, tau_cd=1.4)
+    
+    
+#    Plot Results
+#    ------------------------------------------------------------------------------
+#    ------------------------------------------------------------------------------
+    # step='step_4'
+    # #plot displacement
+    # rhino.plot_data(mdl, lstep=step, field='uz', scale=300.0, cbar_size=1, source='CMMUsermat') # Ploten der Verformungen uz (Resultate: Knoten)
+    # rhino.plot_data(mdl, lstep=step, field='ux', cbar_size=1, source='CMMUsermat') # Ploten der Verformungen ux (Resultate: Knoten)
+    # rhino.plot_data(mdl, lstep=step, field='uy', cbar_size=1, source='CMMUsermat') # Ploten der Verformungen uy (Resultate: Knoten)
+    # #plot internal forces
+    # rhino.plot_data(mdl, lstep=step, field='sf1', cbar_size=1, source='CMMUsermat') # Ploten der verallgemeinerten Spannungen (Resultate: Elementmitte)
+    # rhino.plot_data(mdl, lstep=step, field='sf2', cbar_size=1, source='CMMUsermat') # Ploten der verallgemeinerten Spannungen (Resultate: Elementmitte)
+    # rhino.plot_data(mdl, lstep=step, field='sf3', cbar_size=1, source='CMMUsermat') # Ploten der verallgemeinerten Spannungen (Resultate: Elementmitte)
+    # rhino.plot_data(mdl, lstep=step, field='sf4', cbar_size=1, source='CMMUsermat') # Ploten der verallgemeinerten Spannungen (Resultate: Elementmitte)
+    # rhino.plot_data(mdl, lstep=step, field='sf5', cbar_size=1, source='CMMUsermat') # Ploten der verallgemeinerten Spannungen (Resultate: Elementmitte)
+    # rhino.plot_data(mdl, lstep=step, field='sm1', cbar_size=1, source='CMMUsermat') # Ploten der verallgemeinerten Spannungen (Resultate: Elementmitte)
+    # rhino.plot_data(mdl, lstep=step, field='sm2', cbar_size=1, source='CMMUsermat') # Ploten der verallgemeinerten Spannungen (Resultate: Elementmitte)
+    # rhino.plot_data(mdl, lstep=step, field='sm3', cbar_size=1, source='CMMUsermat') # Ploten der verallgemeinerten Spannungen (Resultate: Elementmitte)
+    # #plot concrete stresses
+    # rhino.plot_principal_stresses(mdl, step=step, shell_layer='top', scale=10**1, numeric='no', values='3') # Hauptspannungen 3 top (Resultate: Gauspunkte)
+    # rhino.plot_principal_stresses(mdl, step=step, shell_layer='top', scale=10**1, numeric='no', values='1') # Hauptspannungen 1 top (Resultate: Gauspunkte)
+    # rhino.plot_principal_stresses(mdl, step=step, shell_layer='bot', scale=10**1, numeric='no', values='3') # Hauptspannungen 3 bot (Resultate: Gauspunkte)
+    # rhino.plot_principal_stresses(mdl, step=step, shell_layer='bot', scale=10**1, numeric='no', values='1') # Hauptspannungen 1 bot (Resultate: Gauspunkte)
+    # # plot concrete strains
+    # rhino.plot_principal_strains(mdl, step=step, shell_layer='top', scale=10**5, numeric='no', values='3') # Hauptverzerrungen 3 top (Resultate: Gauspunkte)
+    # rhino.plot_principal_strains(mdl, step=step, shell_layer='top', scale=10**5, numeric='no', values='1') # Hauptverzerrungen 1 top (Resultate: Gauspunkte)
+    # rhino.plot_principal_strains(mdl, step=step, shell_layer='bot', scale=10**5, numeric='no', values='3') # Hauptverzerrungen 3 bot (Resultate: Gauspunkte)
+    # rhino.plot_principal_strains(mdl, step=step, shell_layer='bot', scale=10**5, numeric='no', values='1') # Hauptverzerrungen 1 bot (Resultate: Gauspunkte)
+    # #plot steel stresses
+    # rhino.plot_steel_stresses(mdl, step=step, Reinf_layer='RL_1', scale=1.3, numeric='no') # Stahlspannungen am Riss 1. Bewehrungslage (Resultate: Gauspunkte)
+    # rhino.plot_steel_stresses(mdl, step=step, Reinf_layer='RL_2', scale=1.3, numeric='no') # Stahlspannungen am Riss 2. Bewehrungslage (Resultate: Gauspunkte)
+    # rhino.plot_steel_stresses(mdl, step=step, Reinf_layer='RL_3', scale=1.3, numeric='no') # Stahlspannungen am Riss 3. Bewehrungslage (Resultate: Gauspunkte)
+    # rhino.plot_steel_stresses(mdl, step=step, Reinf_layer='RL_4', scale=1.3, numeric='no') # Stahlspannungen am Riss 4. Bewehrungslage (Resultate: Gauspunkte)
+    # #plot shear
+    # rhino.plot_principal_shear(mdl, step=step, field='shear', cbar_size=0.5, scale=4, numeric='yes', shear_verification='yes', D_max=32, tau_cd=1.4) # (Resultate: Gauspunkte)
+        
+    
+
+
+    # --------------------------Save Analysis Results -----------------------------------
+    # Save the Rhino file
+    subfolder_path=folder_path+'\\{}_Batch\\{}_{}_CFB'.format(idx_s, idx_s, ID)
+    if not os.path.exists(subfolder_path):
+        os.makedirs(subfolder_path)
+
+    #save structure to a pickle file
+    file_name='{}_{}_structure'.format(idx_s,ID)
+    save_to_pickle(obj=mdl, folder_path=subfolder_path, file_name=file_name)
+    
+    
+    # save results dict to a json file
+    res_dict=mdl.results
+    file_name='{}_{}_analysisResults'.format(idx_s,ID)
+    save_to_json(save_dict=res_dict,folder_path=subfolder_path,
+                    file_name=file_name)
+    
+
+
+#    # save rhino file (with results)
+#    filePath=folder_path+'\\{}_{}_geo_analysis.3dm'.format(idx_s,ID)
+#    opt = r.FileIO.FileWriteOptions()
+#    doc = r.RhinoDoc.ActiveDoc
+#    doc.WriteFile(filePath,opt) #note: also saves DocUserText
+    
+    print('Files saved')
+
+    
+
