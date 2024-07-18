@@ -65,114 +65,104 @@ def hist_matrix(df, n_cols=4, bins=20, color='gray', edgecolor='darkgray'):
     plt.show()  # Display the histograms
 
 
-### from here downward code in progress...!
-#sampler
+
+#plotting function
+def hist_kde_matrix(df, bandwidth=1, n_cols=4, bins=20, color='gray', edgecolor='darkgray', pde_color='navy'): #dodgerblue
+    # Number of columns in the DataFrame
+    n_columns = len(df.columns)
+
+    # Number of histogram columns per row
+    n_cols = 4
+
+    # Calculate the number of rows needed
+    n_rows = m.ceil(n_columns / n_cols)
+
+    fig, axes = plt.subplots(n_rows, n_cols, figsize=(15, n_rows * 2.5))  # Adjust the figsize as needed
+    axes = axes.flatten()
+
+    for i, column in enumerate(df.columns):
+
+        # fit 1d kde
+        data=df[column].values.reshape(-1, 1)
+        kde = KernelDensity(kernel='gaussian', bandwidth=bandwidth).fit(data)
+        # Create a grid of values (covering the range of your data)
+        x_grid = np.linspace(data.min(), data.max(), 1000).reshape(-1, 1)
+        # Evaluate the PDF on the grid
+        log_pdf = kde.score_samples(x_grid)
+        pdf = np.exp(log_pdf)
+
+        # Plot histogram on the corresponding subplot
+        # Plot histogram and keep a patch for legend
+        n, bins, patches = axes[i].hist(df[column], bins=bins, density=True, color=color, edgecolor=edgecolor, alpha=0.7)
+        if i == 0:  # Save the patch for the legend
+            hist_patch = patches[0]
+
+        # Plot KDE and keep a line for legend
+        kde_line, = axes[i].plot(x_grid, pdf, color=pde_color, lw=2)  # Keep the line object for legend
+        
+        axes[i].set_title(f'Histogram of {column}')
+        axes[i].set_xlabel(column)
+        axes[i].set_ylabel('Density')
+        axes[i].grid(False)  # Optional: Remove grid lines
+
+    # Hide any empty subplots if the number of columns is less than n_rows*n_cols
+    for ax in axes[len(df.columns):]:
+        ax.axis('off')
     
-parameterStudie1={'Ranges' :{'L': (2000.,18000.),
-                                    'b1' : (3000.,20000.),
-                                    't_p': (200.,1200.),
+    # Adjust layout to make room for legend
+    plt.tight_layout(rect=[0, 0, 0.9, 1])
 
-                                    't_w':(200., 1200.),   # Wall Thickness [mm]
-                                    'h_w' :(2000.,5000.), 
-                                    },
-                'Constants' : {'fsy': 390,
-                                        'oo' : 30,
-                                        'd3_plate': 12
-                                    }
-                }
 
-hero = {'L': 5800,
-        'b1': 9720,
-        't_p': 400,
-        't_w': 400,
-        'h_w': 2580,
-        'd1_plate': 24,
-        'd4_plate': 24,
-        'd2_plate':12,
-        's_plate': 200,
-        'd1_walls': 14,
-        'd4_walls': 24,
-        's_walls': 200,
-        'fcc': 12.8,
-        'fsy': 390,
-        'fsu_fac': 1.08,
-        's': 0.18179012,
-        'beta': 5}
+        # Add a legend to the figure
+    fig.legend([hist_patch, kde_line], ['Histogram of the data', 'KDE fitted PDE'], loc='upper left', bbox_to_anchor=(1, 0.9))
+
+
+    plt.tight_layout()  # Adjust subplots to fit into the figure area.
+    plt.show()  # Display the histograms
+
+
+# ### from here downward code in progress...!
+# #sampler
+    
+# parameterStudie1={'Ranges' :{'L': (2000.,18000.),
+#                                     'b1' : (3000.,20000.),
+#                                     't_p': (200.,1200.),
+
+#                                     't_w':(200., 1200.),   # Wall Thickness [mm]
+#                                     'h_w' :(2000.,5000.), 
+#                                     },
+#                 'Constants' : {'fsy': 390,
+#                                         'oo' : 30,
+#                                         'd3_plate': 12
+#                                     }
+#                 }
+
+# hero = {'L': 5800,
+#         'b1': 9720,
+#         't_p': 400,
+#         't_w': 400,
+#         'h_w': 2580,
+#         'd1_plate': 24,
+#         'd4_plate': 24,
+#         'd2_plate':12,
+#         's_plate': 200,
+#         'd1_walls': 14,
+#         'd4_walls': 24,
+#         's_walls': 200,
+#         'fcc': 12.8,
+#         'fsy': 390,
+#         'fsu_fac': 1.08,
+#         's': 0.18179012,
+#         'beta': 5}
 
 
     
-variableRanges ={'L': (2000.,18000.),
-                             'b1' : (3000.,20000.)
-                             }
+# variableRanges ={'L': (2000.,18000.),
+#                              'b1' : (3000.,20000.)
+#                              }
     
 
-class CFBSamplingSpace:
-
-    """
-    Samples values according to certain strategies.
-
-    Parameters
-    ----------
-    strategies : List[Strategy]
-        List of strategies to be used for sampling.
-    objective : Operator, optional, default=None
-        Objective to be optimised. The sampler is trained using the objective values of the samples, in order
-        to optimize future sampling campaigns,
-    """
-
-    def __init__(self,variables=None, parameterStudie=1):
-        
-        self.parameterStudie=parameterStudie
-        
-        if variables == None:
-            if parameterStudie==1:
-                variables=parameterStudie1['Ranges']
-
-            else:
-                raise Exception('Not Implemented')
-        self.variables=variables
-
-
-        if parameterStudie==1:
-            self.ranges={k: parameterStudie1['Ranges'][k] for k in variables if k in parameterStudie1['Ranges']}
-            self.constants=parameterStudie1['Constants']
-
-        
-
-
-
-        
-
-    
-    def _get_parameterStudie(self):
-
-        parameterStudie=self.parameterStudie
-
-
-        if parameterStudie == 1:
-
-            variableRanges ={'L': (2000.,18000.),
-                             'b1' : (3000.,20000.)
-                             }
-            
-            variableConstants ={'fsy': 390,
-                                'oo' : 30,
-                                'd3_plate': 12
-                                }
-        
-
-        else:
-            raise Exception('The defined parameterStudie is invalid.')
-        
-        
-        return variableRanges,variableConstants
-
-        
-
-
-# class SamplesGenerator:
-
-
+# class CFBSamplingSpace:
 
 #     """
 #     Samples values according to certain strategies.
@@ -186,14 +176,80 @@ class CFBSamplingSpace:
 #         to optimize future sampling campaigns,
 #     """
 
-#     def __init__(self,n_samples):
-#         self.verbalise='Test'
+#     def __init__(self,variables=None, parameterStudie=1):
+        
+#         self.parameterStudie=parameterStudie
+        
+#         if variables == None:
+#             if parameterStudie==1:
+#                 variables=parameterStudie1['Ranges']
 
-# ==============================================================================
-# Debugging
-# ==============================================================================
+#             else:
+#                 raise Exception('Not Implemented')
+#         self.variables=variables
 
 
-if __name__ == "__main__":
+#         if parameterStudie==1:
+#             self.ranges={k: parameterStudie1['Ranges'][k] for k in variables if k in parameterStudie1['Ranges']}
+#             self.constants=parameterStudie1['Constants']
 
-    pass
+        
+
+
+
+        
+
+    
+#     def _get_parameterStudie(self):
+
+#         parameterStudie=self.parameterStudie
+
+
+#         if parameterStudie == 1:
+
+#             variableRanges ={'L': (2000.,18000.),
+#                              'b1' : (3000.,20000.)
+#                              }
+            
+#             variableConstants ={'fsy': 390,
+#                                 'oo' : 30,
+#                                 'd3_plate': 12
+#                                 }
+        
+
+#         else:
+#             raise Exception('The defined parameterStudie is invalid.')
+        
+        
+#         return variableRanges,variableConstants
+
+        
+
+
+# # class SamplesGenerator:
+
+
+
+# #     """
+# #     Samples values according to certain strategies.
+
+# #     Parameters
+# #     ----------
+# #     strategies : List[Strategy]
+# #         List of strategies to be used for sampling.
+# #     objective : Operator, optional, default=None
+# #         Objective to be optimised. The sampler is trained using the objective values of the samples, in order
+# #         to optimize future sampling campaigns,
+# #     """
+
+# #     def __init__(self,n_samples):
+# #         self.verbalise='Test'
+
+# # ==============================================================================
+# # Debugging
+# # ==============================================================================
+
+
+# if __name__ == "__main__":
+
+#     pass
