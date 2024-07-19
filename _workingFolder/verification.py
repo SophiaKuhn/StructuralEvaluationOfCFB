@@ -610,7 +610,16 @@ def calc_eta(idx_s, start_id, end_id, step, extract_from ='results', folder_name
 
                     res_steel=pd.DataFrame({'eta_min_s' : [0.], 'x_s' : [None], 'y_s' : [None], 'z_s' : [None], 'Location_s':None, 'GP_count_s': [None]})
                     res_concrete=pd.DataFrame({'eta_min_c' : [0.], 'x_c' : [None], 'y_c' : [None], 'z_c' : [None], 'Location_c':[None], 'GP_count_c': [None]})
-                    res_conc_shear=pd.DataFrame({'eta_min_shear' : [0.], 'x_c_shear' : [None], 'y_c_shear' : [None], 'z_c_shear' : [None], 'Location_c_shear':[None], 'element_count_shear': [None]})
+                    
+                    if verify_reduced_area==True:
+                        res_conc_shear=pd.DataFrame({'eta_min_shear' : [0.], 'x_c_shear' : [None], 'y_c_shear' : [None], 'z_c_shear' : [None], 'Location_c_shear':[None], 'element_count_shear': [None], 
+                                                     'eta_min_shear_reduced' : [0.], 'x_c_shear_reduced' : [None], 'y_c_shear_reduced' : [None], 'z_c_shear_reduced' : [None], 'Location_c_shear_reduced':[None], 'element_count_shear_reduced': [None]})
+                    elif verify_reduced_area==False:
+                        res_conc_shear=pd.DataFrame({'eta_min_shear' : [0.], 'x_c_shear' : [None], 'y_c_shear' : [None], 'z_c_shear' : [None], 'Location_c_shear':[None], 'element_count_shear': [None]})
+                    else:
+                        raise Exception("Input for verify_reduced_area invalid.")
+        
+
 
                     if with_eta_stresses:
                         res_concrete_stresses=pd.DataFrame({'eta_min_c_stresses' : [0.], 'x_c_stresses' : [None], 'y_c_stresses' : [None], 'z_c_stresses' : [None], 'Location_c_stresses':[None]})
