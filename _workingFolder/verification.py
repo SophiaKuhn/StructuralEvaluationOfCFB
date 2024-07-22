@@ -322,7 +322,7 @@ def concrete_bending_verification_stresses(structure=None, results = None, step=
     
     return res
 
-def concrete_shear_verification(structure = None, results=None, step=None, return_type='dict', verbalise=True, verify_reduced_area=True, interpolation=True, idx_s=None, ID=None, folder_name=None):
+def concrete_shear_verification(structure = None, results=None, step=None, return_type='dict', verbalise=True, verify_reduced_area=True, interpolation=True, idx_s=None, ID=None, folder_name=None, folder_path=None):
     '''
     Performs the shear verification for the structure.
     Calculating the minimum eta_v of the structure and evaluating the critical position.
@@ -398,8 +398,8 @@ def concrete_shear_verification(structure = None, results=None, step=None, retur
             
 
             #get t_w, t_p, L, h_w from corresponding x.csv file
-            current_directory = os.getcwd()
-            folder_path = os.path.join(current_directory, folder_name)
+            # current_directory = os.getcwd()
+            # folder_path = os.path.join(current_directory, folder_name)
             csv_x_path=folder_path+'\\{}_Batch\\{}_{}_CFB\\x.csv'.format(idx_s,idx_s,ID)
             df_x = pd.read_csv(csv_x_path, delimiter=',', header=None, index_col=0)
             df_x_series = df_x.squeeze() 
@@ -505,7 +505,7 @@ def concrete_shear_verification(structure = None, results=None, step=None, retur
 
 
 
-def calc_eta(idx_s, start_id, end_id, step, extract_from ='results', folder_name='CFBData', with_eta_stresses=False, verify_reduced_area=True, interpolation=True, verbalise=True):
+def calc_eta(idx_s, start_id, end_id, step, extract_from ='results', folder_name='CFBData', with_eta_stresses=False, verify_reduced_area=True, interpolation=True, verbalise=True, prepath=None):
 
     '''
     This function iterates from start_id to end_id. Opens the corresponding file. 
@@ -549,9 +549,13 @@ def calc_eta(idx_s, start_id, end_id, step, extract_from ='results', folder_name
     error_count=0
     error_ids=[]
     
-
-    current_directory = os.getcwd()
-    folder_path = os.path.join(current_directory, folder_name)
+    if prepath==None:
+        current_directory = os.getcwd()
+        prepath=current_directory
+    if folder_name==None:
+        folder_path=prepath
+    else:
+        folder_path = os.path.join(prepath, folder_name)
 
     for ID in range(start_id,end_id+1):
         if verbalise:
@@ -566,6 +570,7 @@ def calc_eta(idx_s, start_id, end_id, step, extract_from ='results', folder_name
             if verbalise:
                 print("Extracting from structure.pkl file")
             # construct file path
+
             filepath=folder_path+'\\{}_Batch\\{}_{}_CFB\\{}_{}_structure.pkl'.format(idx_s,idx_s,ID,idx_s,ID)
             #if a structure pickle file exists
             if os.path.exists(filepath):
@@ -605,7 +610,16 @@ def calc_eta(idx_s, start_id, end_id, step, extract_from ='results', folder_name
 
                     res_steel=pd.DataFrame({'eta_min_s' : [0.], 'x_s' : [None], 'y_s' : [None], 'z_s' : [None], 'Location_s':None, 'GP_count_s': [None]})
                     res_concrete=pd.DataFrame({'eta_min_c' : [0.], 'x_c' : [None], 'y_c' : [None], 'z_c' : [None], 'Location_c':[None], 'GP_count_c': [None]})
-                    res_conc_shear=pd.DataFrame({'eta_min_shear' : [0.], 'x_c_shear' : [None], 'y_c_shear' : [None], 'z_c_shear' : [None], 'Location_c_shear':[None], 'element_count_shear': [None]})
+                    
+                    if verify_reduced_area==True:
+                        res_conc_shear=pd.DataFrame({'eta_min_shear' : [0.], 'x_c_shear' : [None], 'y_c_shear' : [None], 'z_c_shear' : [None], 'Location_c_shear':[None], 'element_count_shear': [None], 
+                                                     'eta_min_shear_reduced' : [0.], 'x_c_shear_reduced' : [None], 'y_c_shear_reduced' : [None], 'z_c_shear_reduced' : [None], 'Location_c_shear_reduced':[None], 'element_count_shear_reduced': [None]})
+                    elif verify_reduced_area==False:
+                        res_conc_shear=pd.DataFrame({'eta_min_shear' : [0.], 'x_c_shear' : [None], 'y_c_shear' : [None], 'z_c_shear' : [None], 'Location_c_shear':[None], 'element_count_shear': [None]})
+                    else:
+                        raise Exception("Input for verify_reduced_area invalid.")
+        
+
 
                     if with_eta_stresses:
                         res_concrete_stresses=pd.DataFrame({'eta_min_c_stresses' : [0.], 'x_c_stresses' : [None], 'y_c_stresses' : [None], 'z_c_stresses' : [None], 'Location_c_stresses':[None]})
@@ -621,7 +635,7 @@ def calc_eta(idx_s, start_id, end_id, step, extract_from ='results', folder_name
                     # extract max values from the analysis results of this structre 
                     df_steel=steel_bending_verification(results=results, step=step, return_type='df',verbalise=verbalise)
                     df_conc=concrete_bending_verification(results=results, step=step, return_type='df', verbalise=verbalise)
-                    df_conc_shear=concrete_shear_verification(results=results, step=step, return_type='df', verbalise=verbalise, verify_reduced_area=verify_reduced_area, interpolation=interpolation, idx_s=idx_s, ID=ID,folder_name=folder_name)
+                    df_conc_shear=concrete_shear_verification(results=results, step=step, return_type='df', verbalise=verbalise, verify_reduced_area=verify_reduced_area, interpolation=interpolation, idx_s=idx_s, ID=ID,folder_name=folder_name, folder_path=folder_path)
 
                     if with_eta_stresses:
                         df_conc_stresses=concrete_bending_verification_stresses(results=results, step=step, return_type='df',verbalise=verbalise)
@@ -653,7 +667,7 @@ def calc_eta(idx_s, start_id, end_id, step, extract_from ='results', folder_name
     return df_res
 
 
-def get_results(idx_s, ID, step=None, extract_from ='results', folder_name='CFBData', verbalise=True):
+def get_results(idx_s, ID, step=None, extract_from ='results', folder_name='CFBData', verbalise=True, prepath=None):
     '''
     This function loads the results dict for bridge with the ID from the sampling batch idx_s. If a step is provided only the results dict for that step is returned.
 
@@ -671,6 +685,8 @@ def get_results(idx_s, ID, step=None, extract_from ='results', folder_name='CFBD
     verbalise: bool
         Flag that defines weather the function should print progress information (if set to True) 
         or should run without printing any progress information (if set to False).
+    prepath:str
+        path to the "CFBData" Folder
 
     
     Returns:
@@ -679,8 +695,10 @@ def get_results(idx_s, ID, step=None, extract_from ='results', folder_name='CFBD
     '''
         
     #construct path
-    current_directory = os.getcwd()
-    filepath=current_directory+'\\CFBData\\{}_Batch\\{}_{}_CFB\\{}_{}_analysisResults.json'.format(idx_s,idx_s,ID,idx_s,ID)
+    if prepath==None:
+        current_directory = os.getcwd()
+        prepath=current_directory
+    filepath=prepath+'\\CFBData\\{}_Batch\\{}_{}_CFB\\{}_{}_analysisResults.json'.format(idx_s,idx_s,ID,idx_s,ID)
     if verbalise:
         print('filepath: ',filepath)
 
@@ -702,7 +720,7 @@ def get_results(idx_s, ID, step=None, extract_from ='results', folder_name='CFBD
 
     return results
 
-def get_structure(idx_s, ID, folder_name='CFBData', extract_from='pickle', verbalise=True):
+def get_structure(idx_s, ID, folder_name='CFBData', extract_from='pickle', verbalise=True, prepath=None):
     '''
     This function loads the structure object with the ID from the sampling batch idx_s. If a step is provided only the results dict for that step is returned.
 
@@ -716,16 +734,21 @@ def get_structure(idx_s, ID, folder_name='CFBData', extract_from='pickle', verba
     verbalise: bool
         Flag that defines weather the function should print progress information (if set to True) 
         or should run without printing any progress information (if set to False).
+    prepath:str
+        path to the "CFBData" Folder
 
     
     Returns:
     structure: obj
         returns the impotred structure object.
     '''
-        
+
+
     #construct path
-    current_directory = os.getcwd()
-    filepath=current_directory+'\\CFBData\\{}_Batch\\{}_{}_CFB\\{}_{}_structure.pkl'.format(idx_s,idx_s,ID,idx_s,ID)
+    if prepath==None:
+        current_directory = os.getcwd()
+        prepath=current_directory
+    filepath=prepath+'\\CFBData\\{}_Batch\\{}_{}_CFB\\{}_{}_structure.pkl'.format(idx_s,idx_s,ID,idx_s,ID)
     if verbalise:
         print('filepath: ',filepath)
 
