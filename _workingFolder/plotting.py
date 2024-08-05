@@ -11,6 +11,94 @@ import torch.optim as optim
 import torchbnn as bnn
 
 
+#-----------------------------------------------------------------------------------------------
+# Data Distributions
+#-----------------------------------------------------------------------------------------------
+
+
+def hist_matrix(df, n_cols=4, bins=20, color='gray', edgecolor='darkgray'):
+    # Number of columns in the DataFrame
+    n_columns = len(df.columns)
+
+    # Number of histogram columns per row
+    n_cols = 4
+
+    # Calculate the number of rows needed
+    n_rows = m.ceil(n_columns / n_cols)
+
+    fig, axes = plt.subplots(n_rows, n_cols, figsize=(15, n_rows * 2.5))  # Adjust the figsize as needed
+    axes = axes.flatten()
+
+    for i, column in enumerate(df.columns):
+        # Plot histogram on the corresponding subplot
+        axes[i].hist(df[column], bins=bins, color=color, edgecolor=edgecolor)  # You can customize the histogram here
+        #axes[i].set_title(f'Histogram of {column}')
+        axes[i].set_xlabel(column)
+        axes[i].set_ylabel('Frequency')
+        axes[i].grid(False)  # Optional: Remove grid lines
+
+    # Hide any empty subplots if the number of columns is less than n_rows*n_cols
+    for ax in axes[len(df.columns):]:
+        ax.axis('off')
+
+    plt.tight_layout()  # Adjust subplots to fit into the figure area.
+    plt.show()  # Display the histograms
+
+
+
+
+def hist_kde_matrix(df, bandwidth=1, n_cols=4, bins=20, color='gray', edgecolor='darkgray', pde_color='navy'): #dodgerblue
+    # Number of columns in the DataFrame
+    n_columns = len(df.columns)
+
+    # Number of histogram columns per row
+    n_cols = 4
+
+    # Calculate the number of rows needed
+    n_rows = m.ceil(n_columns / n_cols)
+
+    fig, axes = plt.subplots(n_rows, n_cols, figsize=(15, n_rows * 2.5))  # Adjust the figsize as needed
+    axes = axes.flatten()
+
+    for i, column in enumerate(df.columns):
+
+        # fit 1d kde
+        data=df[column].values.reshape(-1, 1)
+        kde = KernelDensity(kernel='gaussian', bandwidth=bandwidth).fit(data)
+        # Create a grid of values (covering the range of your data)
+        x_grid = np.linspace(data.min(), data.max(), 1000).reshape(-1, 1)
+        # Evaluate the PDF on the grid
+        log_pdf = kde.score_samples(x_grid)
+        pdf = np.exp(log_pdf)
+
+        # Plot histogram on the corresponding subplot
+        # Plot histogram and keep a patch for legend
+        n, bins, patches = axes[i].hist(df[column], bins=bins, density=True, color=color, edgecolor=edgecolor, alpha=0.7)
+        if i == 0:  # Save the patch for the legend
+            hist_patch = patches[0]
+
+        # Plot KDE and keep a line for legend
+        kde_line, = axes[i].plot(x_grid, pdf, color=pde_color, lw=2)  # Keep the line object for legend
+        
+        axes[i].set_title(f'Histogram of {column}')
+        axes[i].set_xlabel(column)
+        axes[i].set_ylabel('Density')
+        axes[i].grid(False)  # Optional: Remove grid lines
+
+    # Hide any empty subplots if the number of columns is less than n_rows*n_cols
+    for ax in axes[len(df.columns):]:
+        ax.axis('off')
+    
+    # Adjust layout to make room for legend
+    plt.tight_layout(rect=[0, 0, 0.9, 1])
+
+
+        # Add a legend to the figure
+    fig.legend([hist_patch, kde_line], ['Histogram of the data', 'KDE fitted PDE'], loc='upper left', bbox_to_anchor=(1, 0.9))
+
+
+    plt.tight_layout()  # Adjust subplots to fit into the figure area.
+    plt.show()  # Display the histograms
 
 #-----------------------------------------------------------------------------------------------
 # Loss Plots 
@@ -50,7 +138,7 @@ def plot_loss_development(loss_lists, loss_names, save_path=None, model_name=Non
 # Model Evaluation Plots
 #-----------------------------------------------------------------------------------------------
 
-def plot_true_vs_pred(y_true, y_pred, rmse_value, y_name, title=None):
+def plot_true_vs_pred(y_true, y_pred, rmse_value, y_name, title=None, xlim=None,ylim=None ):
     """
     Plot the true values vs. predicted values and the RMSE.
 
@@ -84,6 +172,11 @@ def plot_true_vs_pred(y_true, y_pred, rmse_value, y_name, title=None):
     line_max = max(y_true.max(), y_pred.max())
     plt.plot([line_min, line_max], [line_min, line_max], 'k--', label='Perfect Prediction')
 
+
+    if not ylim==None:
+        plt.ylim((ylim[0],ylim[1]))
+    if not xlim==None:
+        plt.ylim((xlim[0],xlim[1]))
     plt.legend()
     xlabel='True '+y_name
     plt.xlabel(xlabel)
