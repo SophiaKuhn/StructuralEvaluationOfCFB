@@ -32,7 +32,7 @@ import matplotlib.pyplot as plt
 # Prediction
 #-----------------------------------------------------------------------------------------------
 
-def bnn_predict_with_uncertainty(model, x, n=1000):
+def bnn_predict_with_uncertainty(model, x, n=1000, log_transform_back=False):
     """
     Generate n predictions for each sample in x_data using the Bayesian neural network model.
     
@@ -40,6 +40,7 @@ def bnn_predict_with_uncertainty(model, x, n=1000):
     - model: The trained Bayesian neural network model.
     - x: Input data (torch tensor) for which predictions are to be made. Attention: x has to be transformed like the x data the model was trained with!
     - n: Number of predictions to generate for each sample.
+    - log_transform_back: Set to true of predicted values are scaled with ln(y+1) and have to be retransformed (bool).
     
     Returns:
     - y_pred_mean_values: Mean predictions for each sample (numpy array).
@@ -51,12 +52,16 @@ def bnn_predict_with_uncertainty(model, x, n=1000):
     # Reshape and transpose the results for easier computation
     y_pred_n_times = y_pred_n_times[:, :, 0] # each row corresponds to the nth prediction for each data point
     y_pred_n_times = y_pred_n_times.T # each row corresponds to the predictions for a single data point across all n iterations
+    
+    # Transform back from log scale
+    if log_transform_back:
+        y_pred_n_times = np.exp(y_pred_n_times) - 1
 
     # Calculate mean and standard deviation of predictions for each sample
     y_pred_mean_values = np.array([y_pred_n_times[i].mean() for i in range(len(y_pred_n_times))]).reshape(-1, 1)
     y_pred_std_values = np.array([y_pred_n_times[i].std() for i in range(len(y_pred_n_times))]).reshape(-1, 1)
 
-    return y_pred_mean_values, y_pred_std_values
+    return y_pred_mean_values, y_pred_std_values, y_pred_n_times
 
 
 #-----------------------------------------------------------------------------------------------
@@ -99,6 +104,57 @@ def calculate_rmse(y_true, y_pred):
     return rmse
 
 
+#-----------------------------------------------------------------------------------------------
+# Uncertanty Callibration
+#-----------------------------------------------------------------------------------------------
+
+
+def calc_confinence_interval(confidence_level, mean_prediction, std_prediction):
+
+    confidence_interval=np.array([[meanPred - z * std, meanPred + z * std]])
+
+
+
+
+
+
+# ## Uncertanty calibaration plot ### Implemented acc to Hands on paper supplementry material space learner
+# from scipy.stats import chi2 as Chi2Dist
+
+# # calculate covariance
+# deviations = y_train_pred_n_times - y_train_mean_pred_np # deviations of each stochastic prediction from the mean prediction (y_single pred - mean prediction)
+# n_samples, n_predictions = y_train_pred_n_times.shape # get number of samples and number of predictions per sample
+
+# cov_vector = np.zeros(n_samples) # initialize covariance matrix # for a single prediction this is a vector of length of number of sample
+
+# # calculate covariance value for each sample individually and then put at right position in initialized matrix
+# for i in range(n_samples):
+#     deviation=deviations[i]
+#     individual_preds = y_train_pred_n_times[i]
+#     mean_pred = y_train_mean_pred_np[i]
+#     cov=np.dot(deviations[i], deviations[i].T)/(n_predictions - 1) # as we only have one single output this is just a vector #same to np.var(deviations[i], axis=0, ddof=1)
+#     cov_vector[i] = cov
+
+# inv_cov_vector=(1/cov_vector).reshape(-1,1) # the inverse of a vector is simply the each value ^-1 (so the reciprocal)
+
+# nssr=errors*inv_cov_vector*errors
+# nssr=np.sort(nssr.flatten())
+# p_obs = np.linspace(1./nssr.size,1.0,nssr.size)
+# p_pred = Chi2Dist.cdf(nssr, 9)
+
+
+
+# plt.figure()
+# plt.plot(p_pred, p_obs, label='Model calibration curve')
+# plt.plot([0,1],[0,1], 'k--', alpha=0.6, label='Ideal calibration curve')
+# plt.xlabel('Predicted probability')
+# plt.ylabel('Observed probability')
+# plt.axis('equal')
+# plt.xlim([0,1])
+# plt.ylim([0,1])
+# plt.legend()
+
+# plt.show()
 
 #-----------------------------------------------------------------------------------------------
 # Utils
