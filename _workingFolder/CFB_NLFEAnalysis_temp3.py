@@ -92,8 +92,8 @@ print('n_samples: ',n_samples)
 #-------------
 #--------------------------------------------------------------------------
 #!!!!INPUT HERE!!!!!
-start = 0
-end = 399#n_samples
+start = 800
+end = 1199#n_samples
 for i in range(start,end+1):
     
             
@@ -185,7 +185,7 @@ for i in range(start,end+1):
     
     name = 'NLFE_CFB{}'.format(n_name)#_{}_{}'.format(idx_s, ID)
     print('Analysis File Name: ',name)
-    path = 'C:\Temp\\'
+    path = 'C:\Temp3\\'
     mdl = Structure(name=name, path=path)
 
     
