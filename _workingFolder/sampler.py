@@ -46,93 +46,50 @@ def create_subfolders_for_samples(idx_s, n_samples, folder_path):
 
 
 #-----------------------------------------------------------
-#plotting functions
+#filtering Functions
 #-----------------------------------------------------------
 
 
-# def hist_matrix(df, n_cols=4, bins=20, color='gray', edgecolor='darkgray'):
-#     # Number of columns in the DataFrame
-#     n_columns = len(df.columns)
+def filter_eta_range(data, atLeastOne_critical=False,critical_range=[0.5, 3], all_relevant=False, relevant_range = [0, 10]):
 
-#     # Number of histogram columns per row
-#     n_cols = 4
+    if all_relevant:
+        # Mask to check all values lie within the relevant range
+        mask_all_relevant = (
+        (data['eta_min_c'] >= relevant_range[0]) & (data['eta_min_c'] <= relevant_range[1]) &
+        (data['eta_min_s'] >= relevant_range[0]) & (data['eta_min_s'] <= relevant_range[1]) &
+        (data['eta_min_shear'] >= relevant_range[0]) & (data['eta_min_shear'] <= relevant_range[1])
+        )
+    else: 
+        mask_all_relevant=None
 
-#     # Calculate the number of rows needed
-#     n_rows = m.ceil(n_columns / n_cols)
+    if atLeastOne_critical:
+        # Mask to check if at least one value lies within the critical range
+        mask_atLeastOne_critical = (
+            ((data['eta_min_c'] >= critical_range[0]) & (data['eta_min_c'] <= critical_range[1])) |
+            ((data['eta_min_s'] >= critical_range[0]) & (data['eta_min_s'] <= critical_range[1])) |
+            ((data['eta_min_shear'] >= critical_range[0]) & (data['eta_min_shear'] <= critical_range[1]))
+        )
+    else: 
+        mask_atLeastOne_critical=None
 
-#     fig, axes = plt.subplots(n_rows, n_cols, figsize=(15, n_rows * 2.5))  # Adjust the figsize as needed
-#     axes = axes.flatten()
+    if all_relevant & atLeastOne_critical:
+        mask=mask_all_relevant & mask_atLeastOne_critical
+    elif all_relevant:
+        mask=mask_all_relevant 
+    elif atLeastOne_critical:
+        mask=mask_atLeastOne_critical 
+    else:
+        mask=[None]
 
-#     for i, column in enumerate(df.columns):
-#         # Plot histogram on the corresponding subplot
-#         axes[i].hist(df[column], bins=bins, color=color, edgecolor=edgecolor)  # You can customize the histogram here
-#         #axes[i].set_title(f'Histogram of {column}')
-#         axes[i].set_xlabel(column)
-#         axes[i].set_ylabel('Frequency')
-#         axes[i].grid(False)  # Optional: Remove grid lines
-
-#     # Hide any empty subplots if the number of columns is less than n_rows*n_cols
-#     for ax in axes[len(df.columns):]:
-#         ax.axis('off')
-
-#     plt.tight_layout()  # Adjust subplots to fit into the figure area.
-#     plt.show()  # Display the histograms
-
-
-
-
-# def hist_kde_matrix(df, bandwidth=1, n_cols=4, bins=20, color='gray', edgecolor='darkgray', pde_color='navy'): #dodgerblue
-#     # Number of columns in the DataFrame
-#     n_columns = len(df.columns)
-
-#     # Number of histogram columns per row
-#     n_cols = 4
-
-#     # Calculate the number of rows needed
-#     n_rows = m.ceil(n_columns / n_cols)
-
-#     fig, axes = plt.subplots(n_rows, n_cols, figsize=(15, n_rows * 2.5))  # Adjust the figsize as needed
-#     axes = axes.flatten()
-
-#     for i, column in enumerate(df.columns):
-
-#         # fit 1d kde
-#         data=df[column].values.reshape(-1, 1)
-#         kde = KernelDensity(kernel='gaussian', bandwidth=bandwidth).fit(data)
-#         # Create a grid of values (covering the range of your data)
-#         x_grid = np.linspace(data.min(), data.max(), 1000).reshape(-1, 1)
-#         # Evaluate the PDF on the grid
-#         log_pdf = kde.score_samples(x_grid)
-#         pdf = np.exp(log_pdf)
-
-#         # Plot histogram on the corresponding subplot
-#         # Plot histogram and keep a patch for legend
-#         n, bins, patches = axes[i].hist(df[column], bins=bins, density=True, color=color, edgecolor=edgecolor, alpha=0.7)
-#         if i == 0:  # Save the patch for the legend
-#             hist_patch = patches[0]
-
-#         # Plot KDE and keep a line for legend
-#         kde_line, = axes[i].plot(x_grid, pdf, color=pde_color, lw=2)  # Keep the line object for legend
-        
-#         axes[i].set_title(f'Histogram of {column}')
-#         axes[i].set_xlabel(column)
-#         axes[i].set_ylabel('Density')
-#         axes[i].grid(False)  # Optional: Remove grid lines
-
-#     # Hide any empty subplots if the number of columns is less than n_rows*n_cols
-#     for ax in axes[len(df.columns):]:
-#         ax.axis('off')
-    
-#     # Adjust layout to make room for legend
-#     plt.tight_layout(rect=[0, 0, 0.9, 1])
+    if (all_relevant | atLeastOne_critical):
+        data_filtered=data[mask]
+    else:
+        print('Attention: Nothing was filtered! Please select atLeastOne_critical or/and all_relevant')
+        data_filtered=data
 
 
-#         # Add a legend to the figure
-#     fig.legend([hist_patch, kde_line], ['Histogram of the data', 'KDE fitted PDE'], loc='upper left', bbox_to_anchor=(1, 0.9))
+    return data_filtered
 
-
-#     plt.tight_layout()  # Adjust subplots to fit into the figure area.
-#     plt.show()  # Display the histograms
 
 #-----------------------------------------------------------
 #Sample Space Library
