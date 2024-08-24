@@ -5,10 +5,8 @@ import math as m
 import numpy as np
 import matplotlib.pyplot as plt
 
-import torch
-import torch.nn as nn
-import torch.optim as optim
-import torchbnn as bnn
+# import torch
+
 
 from sklearn.neighbors import KernelDensity
 
@@ -151,7 +149,8 @@ def plot_true_vs_pred(y_true, y_pred, rmse_value, y_name, title=None, xlim=None,
     - xlabel: Label for the x-axis (default is 'True $\eta_{min},_{concrete}$').
     - ylabel: Label for the y-axis (default is 'Predicted $\eta_{min},_{concrete}$').
     """
-
+    import torch
+    
     # check if correct type of input
     if isinstance(y_true, torch.Tensor):
         raise Exception('y_true is a torch tensor. It should be a numpy array.')
