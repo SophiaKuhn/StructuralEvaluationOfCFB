@@ -10,6 +10,8 @@ import torch.nn as nn
 import torch.optim as optim
 import torchbnn as bnn
 
+from sklearn.neighbors import KernelDensity
+
 
 #-----------------------------------------------------------------------------------------------
 # Data Distributions
