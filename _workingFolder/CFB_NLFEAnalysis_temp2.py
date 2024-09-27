@@ -68,7 +68,7 @@ import math as m
 
 # define sampling iteration (= Batch number)
 #!!!!INPUT HERE!!!!!
-idx_s = 1002
+idx_s = 1003
 
 
 
@@ -92,8 +92,8 @@ print('n_samples: ',n_samples)
 #-------------
 #--------------------------------------------------------------------------
 #!!!!INPUT HERE!!!!!
-start = 400
-end = 799#n_samples
+start = 200
+end = 399#n_samples
 for i in range(start,end+1):
     
             
@@ -162,17 +162,8 @@ for i in range(start,end+1):
     
     
     # ---------Initialise---------------------
-    if ID % 9== 0:
-        n_name=9
-    elif ID % 8== 0:
-        n_name=8
-    elif ID % 7 == 0:
-        n_name=7
-    elif ID % 6 == 0:
-        n_name=6
-    elif ID % 5 == 0:
-        n_name=5
-    elif ID % 4 == 0:
+
+    if ID % 4 == 0:
         n_name=4
     elif ID % 3 == 0:
         n_name=3
