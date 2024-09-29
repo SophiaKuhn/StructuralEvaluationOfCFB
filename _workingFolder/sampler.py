@@ -50,7 +50,7 @@ def create_subfolders_for_samples(idx_s, n_samples, folder_path):
 #-----------------------------------------------------------
 
 
-def filter_eta_range(data, atLeastOne_critical=False,critical_range=[0.5, 3], all_relevant=False, relevant_range = [0, 10]):
+def filter_eta_range(data, atLeastOne_critical=False, specific_eta_critical = False, specific_eta= None, critical_range=[0.5, 3], all_relevant=False, relevant_range = [0, 10] ):
 
     if all_relevant:
         # Mask to check all values lie within the relevant range
@@ -72,16 +72,37 @@ def filter_eta_range(data, atLeastOne_critical=False,critical_range=[0.5, 3], al
     else: 
         mask_atLeastOne_critical=None
 
-    if all_relevant & atLeastOne_critical:
+    if specific_eta_critical:
+        if specific_eta in ['eta_min_c','eta_min_s', 'eta_min_shear']:
+            print('in list and filtered')
+            # Mask to check if specified eta value lies within the critical range
+            mask_specific_critical = ((data[specific_eta] >= critical_range[0]) & (data[specific_eta] <= critical_range[1]))
+        else:
+            print('Not in list')
+            raise ValueError('The value provided for specific_eta is not valid.')
+    else:
+        mask_specific_critical = None
+
+    if all_relevant & atLeastOne_critical & specific_eta_critical :
+        mask=mask_all_relevant & mask_atLeastOne_critical & mask_specific_critical 
+
+    elif all_relevant & atLeastOne_critical:
         mask=mask_all_relevant & mask_atLeastOne_critical
-    elif all_relevant:
-        mask=mask_all_relevant 
+    elif all_relevant & specific_eta_critical:
+        mask=mask_all_relevant & mask_specific_critical
+    elif atLeastOne_critical & specific_eta_critical:
+        mask = mask_atLeastOne_critical & mask_specific_critical
+
+    elif specific_eta_critical:
+        mask=mask_specific_critical
     elif atLeastOne_critical:
         mask=mask_atLeastOne_critical 
+    elif all_relevant:
+        mask=mask_all_relevant 
     else:
         mask=[None]
 
-    if (all_relevant | atLeastOne_critical):
+    if (all_relevant | atLeastOne_critical  | specific_eta_critical):
         data_filtered=data[mask]
     else:
         print('Attention: Nothing was filtered! Please select atLeastOne_critical or/and all_relevant')
