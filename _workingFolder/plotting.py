@@ -131,7 +131,7 @@ def plot_loss_development(loss_lists, loss_names, save_path=None, model_name=Non
         plt.legend()
         plt.grid(True)
         if save_path:
-            plt.savefig(f"{save_path}/{name}_loss_plot{model_name}.png")
+            plt.savefig(f"{save_path}/{model_name}_{name}_loss_plot.png")
         plt.show()
 
 

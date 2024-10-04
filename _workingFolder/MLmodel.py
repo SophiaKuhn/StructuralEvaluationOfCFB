@@ -104,6 +104,98 @@ def calculate_rmse(y_true, y_pred):
     return rmse
 
 
+def calculate_mape(y_true, y_pred):
+    """
+    Calculate the Mean Absolute Percentage Error (MAPE) between true values and predicted values.
+
+    Args:
+    - y_true: True values (numpy array).
+    - y_pred: Predicted values (numpy array).
+
+    Returns:
+    - mape: The calculated MAPE value (float).
+    """
+    # check if correct type of input
+    if isinstance(y_true, torch.Tensor):
+        raise Exception('y_true is a torch tensor. It should be of the type numpy array.')
+
+    if isinstance(y_pred, torch.Tensor):
+        raise Exception('y_pred is a torch tensor. It should be of the type numpy array.')
+
+    # Check that y_true and y_pred have the same shape
+    if y_true.shape != y_pred.shape:
+        raise ValueError(f'Shape mismatch: y_true has shape {y_true.shape} but y_pred has shape {y_pred.shape}.')
+
+    # Avoid division by zero by adding a small epsilon to y_true
+    eps = 1e-6
+
+    # Calculate the absolute percentage error
+    percentage_error = np.abs((y_true - y_pred) / (y_true + eps))
+
+    # Calculate the mean absolute percentage error and multiply by 100 to get percentage
+    mape = np.mean(percentage_error) * 100
+
+    return mape
+
+
+def calculate_custom_loss(y_true, y_pred, threshold=0.5, alpha=1, beta=1):
+    """
+    Calculate the custom loss between true values and predicted values.
+    The loss is defined as:
+    - alpha * absolute error when y_true <= threshold
+    - beta * percentage error when y_true > threshold
+
+    Args:
+    - y_true: True values (numpy array).
+    - y_pred: Predicted values (numpy array).
+    - threshold: The threshold to switch between absolute and percentage error (float).
+    - alpha: Weight for absolute error when y_true <= threshold (float).
+    - beta: Weight for percentage error when y_true > threshold (float).
+
+    Returns:
+    - custom_loss: The calculated custom loss value (float).
+    """
+    # check if correct type of input
+    if isinstance(y_true, torch.Tensor):
+        raise Exception('y_true is a torch tensor. It should be of the type numpy array.')
+
+    if isinstance(y_pred, torch.Tensor):
+        raise Exception('y_pred is a torch tensor. It should be of the type numpy array.')
+
+    # Check that y_true and y_pred have the same shape
+    if y_true.shape != y_pred.shape:
+        raise ValueError(f'Shape mismatch: y_true has shape {y_true.shape} but y_pred has shape {y_pred.shape}.')
+
+    # Calculate absolute error
+    abs_error = np.abs(y_true - y_pred)
+
+    # Calculate percentage error with a small epsilon to avoid division by zero
+    eps = 1e-6
+    percentage_error = np.abs((y_true - y_pred) / (y_true + eps))
+
+    # Create a mask for when y_true is less than or equal to the threshold
+    below_threshold_mask = y_true <= threshold
+
+    # Apply alpha * absolute error for targets <= threshold
+    loss_below_threshold = alpha * abs_error[below_threshold_mask]
+
+    # Apply beta * percentage error for targets > threshold
+    loss_above_threshold = beta * percentage_error[~below_threshold_mask]
+
+    # Combine both losses
+    custom_loss = np.mean(np.concatenate((loss_below_threshold, loss_above_threshold)))
+
+    return custom_loss
+
+
+
+#-----------------------------------------------------------------------------------------------
+# Model Evaluation Summary
+#-----------------------------------------------------------------------------------------------
+
+def evaluate_model():
+    return
+
 #-----------------------------------------------------------------------------------------------
 # Uncertanty Callibration
 #-----------------------------------------------------------------------------------------------
