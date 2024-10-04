@@ -65,7 +65,68 @@ def bnn_predict_with_uncertainty(model, x, n=1000, log_transform_back=False):
 
 
 #-----------------------------------------------------------------------------------------------
-# Metrics
+# Training Losses
+#-----------------------------------------------------------------------------------------------
+def weighted_mse_loss(predictions, targets, importance_range=(0, 5), high_weight=10):
+    # Calculate the basic MSE loss
+    basic_mse = (predictions - targets) ** 2
+
+    # Apply a higher weight to errors within the specified range
+    weights = torch.ones_like(targets)
+    weights[(targets >= importance_range[0]) & (targets <= importance_range[1])] = high_weight
+
+    # Calculate the weighted MSE loss
+    weighted_mse = basic_mse * weights
+    return weighted_mse.mean()
+
+# mean_squared_log_error
+def msle_loss(pred, targets, base='e'):
+    
+    if base=='e':
+        pred_scaled = torch.log(pred + 1) 
+        targets_scaled = torch.log(targets + 1) 
+    elif base ==10 or base =='10':
+        pred_scaled = torch.log10(pred + 1) 
+        targets_scaled = torch.log10(targets + 1) 
+    else:
+        raise Exception('Invalid input for base parameter.')
+
+    # Calculate the MSE loss
+    msle = ((pred_scaled - targets_scaled ) ** 2).mean()
+
+    return msle
+
+# Define MAPE loss function (Mean Absolute Percentage Error)
+def mape_loss(predictions, targets, eps=1e-6):
+    # Add epsilon to avoid division by zero in case y_i is 0
+    mape = torch.mean(torch.abs((targets - predictions) / (targets + eps))) * 100
+    return mape
+
+# define custom loss functon which is a combination of the MeanPrecentageError above acertain threshhold
+# and the absolute error below the threshhold.
+def custom_loss(predictions, targets, threshold=0.5, alpha=1, beta=1):
+    # Calculate absolute error
+    abs_error = torch.abs(targets - predictions)
+    
+    # Calculate percentage error for targets greater than threshold
+    percentage_error = torch.abs((targets - predictions) / (targets + 1e-6))  # Add small epsilon to avoid division by zero
+    
+    # Create a mask for when targets are less than or equal to the threshold
+    below_threshold_mask = targets <= threshold
+    
+    # Apply alpha * absolute error for targets <= threshold
+    loss_below_threshold = alpha * abs_error[below_threshold_mask]
+    
+    # Apply beta * percentage error for targets > threshold
+    loss_above_threshold = beta * percentage_error[~below_threshold_mask]
+    
+    # Combine the two parts of the loss
+    total_loss = torch.cat((loss_below_threshold, loss_above_threshold)).mean()
+    
+    return total_loss
+
+#-----------------------------------------------------------------------------------------------
+# Evaluation Metrics
 #-----------------------------------------------------------------------------------------------
 
 def calculate_rmse(y_true, y_pred):
@@ -193,8 +254,61 @@ def calculate_custom_loss(y_true, y_pred, threshold=0.5, alpha=1, beta=1):
 # Model Evaluation Summary
 #-----------------------------------------------------------------------------------------------
 
-def evaluate_model():
-    return
+def evaluate_model_performance(y_true, y_pred, dict_name, model_name, eval_dict):
+    """
+    Evaluates model performance by calculating RMSE, MAPE for different ranges
+    and custom loss. Updates eval_dict with the computed values.
+
+    Parameters:
+    y_true (numpy array): True values of the target variable.
+    y_pred (numpy array): Predicted values of the target variable.
+    dict_name (str): Name of the dictionary to store the results.
+    model_name (str): Name of the model.
+    eval_dict (dict): Dictionary to store evaluation metrics.
+
+    Returns:
+    eval_dict: Updated evaluation dictionary with RMSE, MAPE and custom loss metrics.
+    """
+
+    # All data
+    rmse_train_all = calculate_rmse(y_true=y_true, y_pred=y_pred)
+    eval_dict[model_name][dict_name]['rmse_all'] = rmse_train_all
+    mape_train_all = calculate_mape(y_true, y_pred)
+    eval_dict[model_name][dict_name]['mape_all'] = mape_train_all
+
+    # Critical range 1 (0.5 - 1.5)
+    filtered_y_np, filtered_y_pred_np = filter_values_within_range(y_true=y_true, y_pred=y_pred, lb=0.5, ub=1.5)
+    rmse_crit1 = calculate_rmse(filtered_y_np, filtered_y_pred_np)
+    eval_dict[model_name][dict_name]['rmse_crit1'] = rmse_crit1
+    mape_crit1 = calculate_mape(filtered_y_np, filtered_y_pred_np)
+    eval_dict[model_name][dict_name]['mape_crit1'] = mape_crit1
+
+    # Critical range 2 (1.5 - 3)
+    filtered_y_np, filtered_y_pred_np = filter_values_within_range(y_true=y_true, y_pred=y_pred, lb=1.5, ub=3)
+    rmse_crit2 = calculate_rmse(filtered_y_np, filtered_y_pred_np)
+    eval_dict[model_name][dict_name]['rmse_crit2'] = rmse_crit2
+    mape_crit2 = calculate_mape(filtered_y_np, filtered_y_pred_np)
+    eval_dict[model_name][dict_name]['mape_crit2'] = mape_crit2
+
+    # Critical range 3 (3 - 10)
+    filtered_y_np, filtered_y_pred_np = filter_values_within_range(y_true=y_true, y_pred=y_pred, lb=3, ub=10)
+    rmse_crit3 = calculate_rmse(filtered_y_np, filtered_y_pred_np)
+    eval_dict[model_name][dict_name]['rmse_crit3'] = rmse_crit3
+    mape_crit3 = calculate_mape(filtered_y_np, filtered_y_pred_np)
+    eval_dict[model_name][dict_name]['mape_crit3'] = mape_crit3
+
+    # Critical range 4 (10 - 500)
+    filtered_y_np, filtered_y_pred_np = filter_values_within_range(y_true=y_true, y_pred=y_pred, lb=10, ub=500)
+    rmse_crit4 = calculate_rmse(filtered_y_np, filtered_y_pred_np)
+    eval_dict[model_name][dict_name]['rmse_crit4'] = rmse_crit4
+    mape_crit4 = calculate_mape(filtered_y_np, filtered_y_pred_np)
+    eval_dict[model_name][dict_name]['mape_crit4'] = mape_crit4
+
+    # Custom loss
+    custom_loss = calculate_custom_loss(y_true=y_true, y_pred=y_pred, threshold=0.5, alpha=1, beta=1)
+    eval_dict[model_name][dict_name]['custom'] = custom_loss
+
+    return eval_dict
 
 #-----------------------------------------------------------------------------------------------
 # Uncertanty Callibration
