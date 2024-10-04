@@ -79,6 +79,19 @@ def weighted_mse_loss(predictions, targets, importance_range=(0, 5), high_weight
     weighted_mse = basic_mse * weights
     return weighted_mse.mean()
 
+def weighted_mse_loss_2_ranges(predictions, targets, importance_range=(0, 2, 5), high_weight=[100,10]):
+    # Calculate the basic MSE loss
+    basic_mse = (predictions - targets) ** 2
+
+    # Apply a higher weight to errors within the specified range
+    weights = torch.ones_like(targets)
+    weights[(targets >= importance_range[0]) & (targets <= importance_range[1])] = high_weight[0]
+    weights[(targets >= importance_range[1]) & (targets <= importance_range[2])] = high_weight[1]
+
+    # Calculate the weighted MSE loss
+    weighted_mse = basic_mse * weights
+    return weighted_mse.mean()
+
 # mean_squared_log_error
 def msle_loss(pred, targets, base='e'):
     
