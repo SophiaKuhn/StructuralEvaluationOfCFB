@@ -1,0 +1,470 @@
+{
+    "1001_no0_3_20_rmse_500_1": {
+        "model_settings": {
+            "batch": 1001,
+            "filtered": "without zero etas",
+            "total_data_size": 6010,
+            "test_split": 0.2,
+            "val_split": 0.2,
+            "layers": 3,
+            "width": [
+                16,
+                20,
+                20
+            ],
+            "loss": "cost",
+            "kl_weight": 0.001,
+            "learning_rate": 0.001,
+            "epochs": 500,
+            "batch_size": 32
+        },
+        "training_set_performance": {
+            "rmse_all": 3.734505750658081,
+            "mape_all": 4949.260817740838,
+            "rmse_crit1": 1.5986372748420694,
+            "mape_crit1": 136.2501117256553,
+            "rmse_crit2": 1.551925625707856,
+            "mape_crit2": 54.37055464061095,
+            "rmse_crit3": 1.9535538470429348,
+            "mape_crit3": 27.412232378918212,
+            "rmse_crit4": 5.27106323668057,
+            "mape_crit4": 13.239928741886342,
+            "custom": 0.3816503999787,
+            "ECE": 0.3769942797711909,
+            "TCE": 37.699427977119086,
+            "CB": 37.699427977119086
+        },
+        "validation_set_performance": {
+            "rmse_all": 5.9319562964731,
+            "mape_all": 71.94231778645445,
+            "rmse_crit1": 1.9021277031019168,
+            "mape_crit1": 149.21109923366316,
+            "rmse_crit2": 1.7102110918290125,
+            "mape_crit2": 56.82116063855187,
+            "rmse_crit3": 2.084236697865589,
+            "mape_crit3": 29.44317153436079,
+            "rmse_crit4": 8.890633596942985,
+            "mape_crit4": 14.772102749124413,
+            "custom": 0.3779619636803932,
+            "ECE": 0.38830561330561336,
+            "TCE": 38.83056133056134,
+            "CB": 38.83056133056134
+        }
+    },
+    "1001_no0_3_20_weighted_mse_500_1": {
+        "model_settings": {
+            "batch": 1001,
+            "filtered": "without zero etas",
+            "total_data_size": 6010,
+            "test_split": 0.2,
+            "val_split": 0.2,
+            "layers": 3,
+            "width": [
+                16,
+                20,
+                20
+            ],
+            "loss": "cost",
+            "kl_weight": 0.001,
+            "learning_rate": 0.001,
+            "epochs": 500,
+            "batch_size": 32
+        },
+        "training_set_performance": {
+            "rmse_all": 5.5180361984936885,
+            "mape_all": 3578.4038836726245,
+            "rmse_crit1": 0.6464933529715882,
+            "mape_crit1": 62.59282099255867,
+            "rmse_crit2": 0.7283616199923221,
+            "mape_crit2": 24.907149440604393,
+            "rmse_crit3": 3.330417256167344,
+            "mape_crit3": 47.200658425802125,
+            "rmse_crit4": 7.835802049335879,
+            "mape_crit4": 21.815863442714896,
+            "custom": 0.37926746033788844,
+            "ECE": 0.4034139365574623,
+            "TCE": 40.34139365574623,
+            "CB": 40.34139365574623
+        },
+        "validation_set_performance": {
+            "rmse_all": 7.264521153921232,
+            "mape_all": 73.59200360682686,
+            "rmse_crit1": 1.0864475048834639,
+            "mape_crit1": 78.90955462991215,
+            "rmse_crit2": 1.4800432476117569,
+            "mape_crit2": 38.48078709864871,
+            "rmse_crit3": 3.1633820456559882,
+            "mape_crit3": 46.16419763228952,
+            "rmse_crit4": 10.81976478736685,
+            "mape_crit4": 22.64554124362761,
+            "custom": 0.4027615737280803,
+            "ECE": 0.40682952182952187,
+            "TCE": 40.682952182952185,
+            "CB": 40.682952182952185
+        }
+    },
+    "1001_no0_3_20_custom_500_1": {
+        "model_settings": {
+            "batch": 1001,
+            "filtered": "without zero etas",
+            "total_data_size": 6010,
+            "test_split": 0.2,
+            "val_split": 0.2,
+            "layers": 3,
+            "width": [
+                16,
+                20,
+                20
+            ],
+            "loss": "custom",
+            "kl_weight": 0.001,
+            "learning_rate": 0.001,
+            "epochs": 500,
+            "batch_size": 32
+        },
+        "training_set_performance": {
+            "rmse_all": 9.603804265883253,
+            "mape_all": 1932.7350673505066,
+            "rmse_crit1": 0.539447695232813,
+            "mape_crit1": 34.970630178473414,
+            "rmse_crit2": 0.886540765026341,
+            "mape_crit2": 29.528071309220653,
+            "rmse_crit3": 1.7432994649692808,
+            "mape_crit3": 22.653197895708512,
+            "rmse_crit4": 14.524601846645131,
+            "mape_crit4": 14.639693896005578,
+            "custom": 0.21998495525080408,
+            "ECE": 0.3720020800832034,
+            "TCE": 37.20020800832034,
+            "CB": 37.20020800832034
+        },
+        "validation_set_performance": {
+            "rmse_all": 10.045721957153965,
+            "mape_all": 42.149602593802435,
+            "rmse_crit1": 1.158981829068809,
+            "mape_crit1": 78.61257224801082,
+            "rmse_crit2": 1.310117006248277,
+            "mape_crit2": 39.01368399114433,
+            "rmse_crit3": 1.864191242532823,
+            "mape_crit3": 25.56007548518981,
+            "rmse_crit4": 15.4386046683019,
+            "mape_crit4": 15.3104435693837,
+            "custom": 0.2761752808054363,
+            "ECE": 0.3982432432432434,
+            "TCE": 39.82432432432434,
+            "CB": 39.82432432432434
+        }
+    },
+    "1001_no0_3_20_log_500_1": {
+        "model_settings": {
+            "batch": 1001,
+            "filtered": "without zero etas",
+            "total_data_size": 6010,
+            "test_split": 0.2,
+            "val_split": 0.2,
+            "layers": 3,
+            "width": [
+                16,
+                20,
+                20
+            ],
+            "loss": "log",
+            "kl_weight": 0.001,
+            "learning_rate": 0.001,
+            "epochs": 500,
+            "batch_size": 32
+        },
+        "training_set_performance": {
+            "rmse_all": 13.869566438757461,
+            "mape_all": 1622.5132108032951,
+            "rmse_crit1": 0.7428359975917476,
+            "mape_crit1": 56.355392106688754,
+            "rmse_crit2": 0.9942300202832187,
+            "mape_crit2": 32.56255731558796,
+            "rmse_crit3": 1.7903233143605315,
+            "mape_crit3": 23.078481721514425,
+            "rmse_crit4": 21.040028542699048,
+            "mape_crit4": 23.17207350388807,
+            "custom": 0.28435897338830257,
+            "ECE": 0.3890379615184608,
+            "TCE": 38.90379615184608,
+            "CB": 38.90379615184608
+        },
+        "validation_set_performance": {
+            "rmse_all": 14.405865190387848,
+            "mape_all": 54.997689789843996,
+            "rmse_crit1": 1.2496892287232968,
+            "mape_crit1": 93.49659700265039,
+            "rmse_crit2": 1.274105426443227,
+            "mape_crit2": 41.761065386849744,
+            "rmse_crit3": 1.7775479164208454,
+            "mape_crit3": 24.757560307768532,
+            "rmse_crit4": 22.23365065754196,
+            "mape_crit4": 24.020741812750085,
+            "custom": 0.33208169392512527,
+            "ECE": 0.3974740124740126,
+            "TCE": 39.74740124740126,
+            "CB": 39.74740124740126
+        }
+    },
+    "1001_no0_3_20_weighted_mse_500_2": {
+        "model_settings": {
+            "batch": 1001,
+            "filtered": "without zero etas",
+            "total_data_size": 6010,
+            "test_split": 0.2,
+            "val_split": 0.2,
+            "layers": 3,
+            "width": [
+                16,
+                20,
+                20
+            ],
+            "loss": "weighted_mse",
+            "kl_weight": 0.0001,
+            "learning_rate": 0.001,
+            "epochs": 500,
+            "batch_size": 32
+        },
+        "training_set_performance": {
+            "rmse_all": 4.693279901231375,
+            "mape_all": 3097.063695589964,
+            "rmse_crit1": 0.5953526880637847,
+            "mape_crit1": 55.12348257950206,
+            "rmse_crit2": 0.719040032025184,
+            "mape_crit2": 25.451553129519876,
+            "rmse_crit3": 3.0376549963163604,
+            "mape_crit3": 43.497757963459925,
+            "rmse_crit4": 6.587088683057933,
+            "mape_crit4": 19.099119616137685,
+            "custom": 0.34586023800881666,
+            "ECE": 0.4116016640665627,
+            "TCE": 41.160166406656266,
+            "CB": 41.160166406656266
+        },
+        "validation_set_performance": {
+            "rmse_all": 6.820329360958074,
+            "mape_all": 64.48538882043307,
+            "rmse_crit1": 0.8382587506757967,
+            "mape_crit1": 69.17237546320575,
+            "rmse_crit2": 1.314625707124056,
+            "mape_crit2": 33.488801410081734,
+            "rmse_crit3": 3.0276922899527055,
+            "mape_crit3": 43.252999129051155,
+            "rmse_crit4": 10.149947082516446,
+            "mape_crit4": 20.217279039143012,
+            "custom": 0.3630118014285114,
+            "ECE": 0.41150727650727653,
+            "TCE": 41.15072765072765,
+            "CB": 41.15072765072765
+        }
+    },
+    "1001_no0_3_20_custom_500_2": {
+        "model_settings": {
+            "batch": 1001,
+            "filtered": "without zero etas",
+            "total_data_size": 6010,
+            "test_split": 0.2,
+            "val_split": 0.2,
+            "layers": 3,
+            "width": [
+                16,
+                20,
+                20
+            ],
+            "loss": "custom",
+            "kl_weight": 0.0001,
+            "learning_rate": 0.001,
+            "epochs": 500,
+            "batch_size": 32
+        },
+        "training_set_performance": {
+            "rmse_all": 6.8912696830264935,
+            "mape_all": 1711.8921598572979,
+            "rmse_crit1": 0.5253938001742104,
+            "mape_crit1": 32.98742291958527,
+            "rmse_crit2": 0.8277514796632207,
+            "mape_crit2": 27.378182642953625,
+            "rmse_crit3": 1.7290500526263624,
+            "mape_crit3": 21.564222499498133,
+            "rmse_crit4": 10.362848079170245,
+            "mape_crit4": 12.745255728746214,
+            "custom": 0.1993036409226017,
+            "ECE": 0.3691731669266771,
+            "TCE": 36.91731669266771,
+            "CB": 36.91731669266771
+        },
+        "validation_set_performance": {
+            "rmse_all": 7.387943503941313,
+            "mape_all": 39.91062870302983,
+            "rmse_crit1": 1.0607906867081673,
+            "mape_crit1": 72.32449067029626,
+            "rmse_crit2": 1.2992472013546148,
+            "mape_crit2": 38.40299431403529,
+            "rmse_crit3": 1.818346953964167,
+            "mape_crit3": 24.800333109357656,
+            "rmse_crit4": 11.286887287519594,
+            "mape_crit4": 13.51134512047249,
+            "custom": 0.25868445442605126,
+            "ECE": 0.4038981288981289,
+            "TCE": 40.389812889812895,
+            "CB": 40.389812889812895
+        }
+    },
+    "1001_no0_3_20_log_500_2": {
+        "model_settings": {
+            "batch": 1001,
+            "filtered": "without zero etas",
+            "total_data_size": 6010,
+            "test_split": 0.2,
+            "val_split": 0.2,
+            "layers": 3,
+            "width": [
+                16,
+                20,
+                20
+            ],
+            "loss": "log",
+            "kl_weight": 0.0001,
+            "learning_rate": 0.001,
+            "epochs": 500,
+            "batch_size": 32
+        },
+        "training_set_performance": {
+            "rmse_all": 8.499207575559433,
+            "mape_all": 1760.326505252353,
+            "rmse_crit1": 0.7973799710547054,
+            "mape_crit1": 61.080498649625305,
+            "rmse_crit2": 0.9597288702472219,
+            "mape_crit2": 31.418754043756277,
+            "rmse_crit3": 1.6404975432392004,
+            "mape_crit3": 22.243788073742795,
+            "rmse_crit4": 12.836970132108931,
+            "mape_crit4": 16.45619124104348,
+            "custom": 0.25374993617851277,
+            "ECE": 0.3955694227769112,
+            "TCE": 39.55694227769112,
+            "CB": 39.55694227769112
+        },
+        "validation_set_performance": {
+            "rmse_all": 9.135857510460115,
+            "mape_all": 50.962530732100134,
+            "rmse_crit1": 1.3157036890518443,
+            "mape_crit1": 100.975575937169,
+            "rmse_crit2": 1.4026045698818816,
+            "mape_crit2": 39.93307267704622,
+            "rmse_crit3": 1.8504254555097228,
+            "mape_crit3": 25.16663803412528,
+            "rmse_crit4": 14.01271683025419,
+            "mape_crit4": 17.949312258772174,
+            "custom": 0.30896471104308504,
+            "ECE": 0.40711018711018715,
+            "TCE": 40.71101871101872,
+            "CB": 40.71101871101872
+        }
+    },
+    "1001_no0_3_20_log_500_3": {
+        "model_settings": {
+            "batch": 1001,
+            "filtered": "without zero etas",
+            "total_data_size": 6010,
+            "test_split": 0.2,
+            "val_split": 0.2,
+            "layers": 3,
+            "width": [
+                16,
+                20,
+                20
+            ],
+            "loss": "log",
+            "kl_weight": 0.01,
+            "learning_rate": 0.001,
+            "epochs": 500,
+            "batch_size": 32
+        },
+        "training_set_performance": {
+            "rmse_all": 21.78061699748834,
+            "mape_all": 4428.965952110361,
+            "rmse_crit1": 2.7303282628987042,
+            "mape_crit1": 158.77764797596907,
+            "rmse_crit2": 3.2069400992590635,
+            "mape_crit2": 71.43330163258513,
+            "rmse_crit3": 4.294164119093678,
+            "mape_crit3": 50.23541156858252,
+            "rmse_crit4": 32.86515185992649,
+            "mape_crit4": 37.25024785743711,
+            "custom": 0.5912794401700809,
+            "ECE": 0.40978159126365055,
+            "TCE": 40.97815912636506,
+            "CB": 40.97815912636506
+        },
+        "validation_set_performance": {
+            "rmse_all": 22.346881537729185,
+            "mape_all": 106.4094176340181,
+            "rmse_crit1": 3.9562273223721247,
+            "mape_crit1": 175.6455041460573,
+            "rmse_crit2": 3.1095282324204634,
+            "mape_crit2": 84.59446969079323,
+            "rmse_crit3": 4.450816832955191,
+            "mape_crit3": 49.725726862687885,
+            "rmse_crit4": 34.28323178826553,
+            "mape_crit4": 37.79334213510446,
+            "custom": 0.6099607307762351,
+            "ECE": 0.41087318087318087,
+            "TCE": 41.08731808731809,
+            "CB": 41.08731808731809
+        }
+    },
+    "1001_no0_3_20_log_500_4": {
+        "model_settings": {
+            "batch": 1001,
+            "filtered": "without zero etas",
+            "total_data_size": 6010,
+            "test_split": 0.2,
+            "val_split": 0.2,
+            "layers": 3,
+            "width": [
+                16,
+                20,
+                20
+            ],
+            "loss": "log",
+            "kl_weight": 1e-05,
+            "learning_rate": 0.001,
+            "epochs": 500,
+            "batch_size": 32
+        },
+        "training_set_performance": {
+            "rmse_all": 5.952508364352673,
+            "mape_all": 958.5576269973243,
+            "rmse_crit1": 0.7048426659695709,
+            "mape_crit1": 53.74840285754235,
+            "rmse_crit2": 0.77813447930421,
+            "mape_crit2": 25.833175067692,
+            "rmse_crit3": 1.3615696480995876,
+            "mape_crit3": 18.276086631306157,
+            "rmse_crit4": 8.962648027738698,
+            "mape_crit4": 13.189473730871576,
+            "custom": 0.20643574839582313,
+            "ECE": 0.3950962038481539,
+            "TCE": 39.50962038481539,
+            "CB": 39.50962038481539
+        },
+        "validation_set_performance": {
+            "rmse_all": 6.1067651481785585,
+            "mape_all": 43.94628565581783,
+            "rmse_crit1": 1.077308084162906,
+            "mape_crit1": 84.75129397881516,
+            "rmse_crit2": 1.4647027303716629,
+            "mape_crit2": 38.631916217321596,
+            "rmse_crit3": 1.6204778236915354,
+            "mape_crit3": 21.68759173908287,
+            "rmse_crit4": 9.291515878908124,
+            "mape_crit4": 14.199723406780935,
+            "custom": 0.26623773790751654,
+            "ECE": 0.4151455301455302,
+            "TCE": 41.514553014553016,
+            "CB": 41.514553014553016
+        }
+    }
+}

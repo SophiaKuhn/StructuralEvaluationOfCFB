@@ -1,0 +1,71 @@
+{
+    "shear_1001_1002_no0_6_20_rmse_weighted_mse_400_300_1": {
+        "model_settings": {
+            "batch": "1001_1002",
+            "filtered": "without zero etas",
+            "total_data_size": 8008,
+            "test_split": 0.2,
+            "val_split": 0.2,
+            "layers": 6,
+            "width": [
+                16,
+                20,
+                20,
+                20,
+                20,
+                20
+            ],
+            "loss": [
+                "rmse",
+                "weighted mse"
+            ],
+            "wMSE_loss_importance_range": [
+                0.1,
+                2
+            ],
+            "wMSE_loss_high_weight": 1000,
+            "kl_weight": 0.001,
+            "learning_rate": [
+                0.001,
+                0.001
+            ],
+            "epochs": [
+                400,
+                300
+            ],
+            "batch_size": 32
+        },
+        "training_set_performance": {
+            "rmse_all": 0.6744220408051429,
+            "mape_all": 1205277.7708984201,
+            "rmse_crit1": 0.24698482711335196,
+            "mape_crit1": 21.751715340585008,
+            "rmse_crit2": 0.6143360287813255,
+            "mape_crit2": 21.086699069228075,
+            "rmse_crit3": 1.3590382968146406,
+            "mape_crit3": 22.471637021572725,
+            "rmse_crit4": 2.415837082236711,
+            "mape_crit4": 11.818975571712595,
+            "custom": 0.22477153809890021,
+            "ECE": 0.432619780971937,
+            "TCE": 43.2619780971937,
+            "CB": 43.247604380561256
+        },
+        "validation_set_performance": {
+            "rmse_all": 0.812755216926473,
+            "mape_all": 348.3008604027124,
+            "rmse_crit1": 0.36289066415770094,
+            "mape_crit1": 29.163865895064895,
+            "rmse_crit2": 0.7011577002097318,
+            "mape_crit2": 23.766519065254315,
+            "rmse_crit3": 1.34105163082371,
+            "mape_crit3": 22.000543025869188,
+            "rmse_crit4": 2.4569440990935503,
+            "mape_crit4": 16.028384107060255,
+            "custom": 0.24956734148950077,
+            "ECE": 0.45220374220374215,
+            "TCE": 45.22037422037422,
+            "CB": 45.22037422037422
+        }
+    }
+}
