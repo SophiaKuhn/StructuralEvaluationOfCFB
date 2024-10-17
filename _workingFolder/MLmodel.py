@@ -26,44 +26,6 @@ import matplotlib.pyplot as plt
 
 
 
-
-
-#-----------------------------------------------------------------------------------------------
-# Prediction
-#-----------------------------------------------------------------------------------------------
-
-def bnn_predict_with_uncertainty(model, x, n=1000, log_transform_back=False):
-    """
-    Generate n predictions for each sample in x_data using the Bayesian neural network model.
-    
-    Args:
-    - model: The trained Bayesian neural network model.
-    - x: Input data (torch tensor) for which predictions are to be made. Attention: x has to be transformed like the x data the model was trained with!
-    - n: Number of predictions to generate for each sample.
-    - log_transform_back: Set to true of predicted values are scaled with ln(y+1) and have to be retransformed (bool).
-    
-    Returns:
-    - y_pred_mean_values: Mean predictions for each sample (numpy array).
-    - y_pred_std_values: Standard deviation of predictions for each sample (numpy array).
-    """
-    # Generate n predictions for the input data
-    y_pred_n_times = np.array([model(x).data.numpy() for k in range(n)])
-
-    # Reshape and transpose the results for easier computation
-    y_pred_n_times = y_pred_n_times[:, :, 0] # each row corresponds to the nth prediction for each data point
-    y_pred_n_times = y_pred_n_times.T # each row corresponds to the predictions for a single data point across all n iterations
-    
-    # Transform back from log scale
-    if log_transform_back:
-        y_pred_n_times = np.exp(y_pred_n_times) - 1
-
-    # Calculate mean and standard deviation of predictions for each sample
-    y_pred_mean_values = np.array([y_pred_n_times[i].mean() for i in range(len(y_pred_n_times))]).reshape(-1, 1)
-    y_pred_std_values = np.array([y_pred_n_times[i].std() for i in range(len(y_pred_n_times))]).reshape(-1, 1)
-
-    return y_pred_mean_values, y_pred_std_values, y_pred_n_times
-
-
 #-----------------------------------------------------------------------------------------------
 # Training Losses
 #-----------------------------------------------------------------------------------------------
@@ -262,6 +224,43 @@ def calculate_custom_loss(y_true, y_pred, threshold=0.5, alpha=1, beta=1):
     return custom_loss
 
 
+#-----------------------------------------------------------------------------------------------
+# Prediction
+#-----------------------------------------------------------------------------------------------
+
+def bnn_predict_with_uncertainty(model, x, n=1000, log_transform_back=False):
+    """
+    Generate n predictions for each sample in x_data using the Bayesian neural network model.
+    
+    Args:
+    - model: The trained Bayesian neural network model.
+    - x: Input data (torch tensor) for which predictions are to be made. Attention: x has to be transformed like the x data the model was trained with!
+    - n: Number of predictions to generate for each sample.
+    - log_transform_back: Set to true of predicted values are scaled with ln(y+1) and have to be retransformed (bool).
+    
+    Returns:
+    - y_pred_mean_values: Mean predictions for each sample (numpy array).
+    - y_pred_std_values: Standard deviation of predictions for each sample (numpy array).
+    """
+    # Generate n predictions for the input data
+    y_pred_n_times = np.array([model(x).data.numpy() for k in range(n)])
+
+    # Reshape and transpose the results for easier computation
+    y_pred_n_times = y_pred_n_times[:, :, 0] # each row corresponds to the nth prediction for each data point
+    y_pred_n_times = y_pred_n_times.T # each row corresponds to the predictions for a single data point across all n iterations
+    
+    # Transform back from log scale
+    if log_transform_back:
+        y_pred_n_times = np.exp(y_pred_n_times) - 1
+
+    # Calculate mean and standard deviation of predictions for each sample
+    y_pred_mean_values = np.array([y_pred_n_times[i].mean() for i in range(len(y_pred_n_times))]).reshape(-1, 1)
+    y_pred_std_values = np.array([y_pred_n_times[i].std() for i in range(len(y_pred_n_times))]).reshape(-1, 1)
+
+    return y_pred_mean_values, y_pred_std_values, y_pred_n_times
+
+
+
 
 #-----------------------------------------------------------------------------------------------
 # Model Evaluation Summary
@@ -328,9 +327,107 @@ def evaluate_model_performance(y_true, y_pred, dict_name, model_name, eval_dict)
 #-----------------------------------------------------------------------------------------------
 
 
-def calc_confinence_interval(confidence_level, mean_prediction, std_prediction):
+def evaluate_confidence_levels(y_true, y_pred_mean, pred_std, n_confidence_levels=20 ):
 
-    confidence_interval=np.array([[meanPred - z * std, meanPred + z * std]])
+    from scipy.stats import norm
+
+    # Define a range of confidence levels
+    expected_confidence_levels = np.linspace(0, 1, n_confidence_levels)
+    observed_confidence_levels = []
+
+    # Compute prediction intervals (e.g., 95% confidence intervals) (Assumption that the predictive distribution is a normal dirtsibution)
+    for confidence_level in expected_confidence_levels:
+        z = norm.ppf((1 + confidence_level) / 2)  # z-score for the confidence level
+        prediction_intervals = np.array([
+            [meanPred - z * std, meanPred + z * std]
+            for meanPred, std in zip(y_pred_mean, pred_std)
+        ])
+
+        # Check if actual values fall within prediction intervals
+        within_intervals = np.array([
+            interval[0] <= y_true <= interval[1]
+            for interval, y_true in zip(prediction_intervals, y_true)
+        ])
+        
+        # Proportion of times actual values fall within prediction intervals
+        coverage = np.mean(within_intervals)
+        observed_confidence_levels.append(coverage)
+
+    return expected_confidence_levels,observed_confidence_levels
+
+
+
+def calc_uncertainty_callibaration_metrics(expected_confidence_levels, observed_confidence_levels, verbalise=False):
+
+    # Calculate Expected Calibration Error (ECE)
+    ece = np.mean(np.abs(expected_confidence_levels - observed_confidence_levels))
+    if verbalise:
+        print("Expected Calibration Error (ECE):", ece)
+
+    #Note that these following error metrics are highly dependent on the number of confidence levels the error is calzclated with as it is not normalised but a sum (so value only comparible when caluclated always with same n)
+    # Calculate Total Calibration Error (TCE)
+    tce = np.sum(np.abs(expected_confidence_levels - observed_confidence_levels))
+    if verbalise:
+        print("Total Calibration Error (TCE):", tce)
+
+    # Calculate Bias (Positive for Overconfidence, Negative for Underconfidence)
+    bias = np.sum(expected_confidence_levels - observed_confidence_levels)
+    if verbalise:
+        print("Calibration Bias:", bias)
+
+    return ece, tce, bias 
+
+def plot_uncertainty_callibaration_curve(expected_confidence_levels, observed_confidence_levels):
+    
+    # Plot the calibration curve
+    plt.figure(figsize=(5, 5))
+    plt.plot(expected_confidence_levels, observed_confidence_levels,  label='Model calibration curve', color='darkblue')
+    plt.plot([0, 1], [0, 1], linestyle='--', label='Perfect calibration',color='gray')
+    # plt.plot(p_pred, p_obs, label='Model calibration curve')
+    # plt.plot([0,1],[0,1], 'k--', alpha=0.6, label='Ideal calibration curve')
+    plt.xlabel('Expected confindence level')
+    plt.ylabel('Observed confindence level')
+    plt.title('Calibration Curve')
+    plt.axis('equal')
+    plt.xlim([0,1])
+    plt.ylim([0,1])
+    plt.legend()
+
+    plt.grid(True)
+    plt.show()
+
+# def plot_uncertainty_callibaration_curve(expected_confidence_levels, observed_confidence_levels, ece=None, tce=None, bias=None, print_errors=True):
+    
+#     # Plot the calibration curve
+#     plt.figure(figsize=(7, 5))
+#     plt.plot(expected_confidence_levels, observed_confidence_levels, label='Model calibration curve', color='darkblue')
+#     plt.plot([0, 1], [0, 1], linestyle='--', label='Perfect calibration', color='gray')
+
+#     # Labels and title
+#     plt.xlabel('Expected Confidence Level')
+#     plt.ylabel('Observed Confidence Level')
+#     plt.title('Calibration Curve')
+#     plt.axis('equal')
+
+    
+#     # Adjust layout to make space for the legend
+#     plt.tight_layout(rect=[0, 0, 0.75, 1])  # Adjust right margin to fit legend outside
+#     plt.xlim([0, 1])
+#     plt.ylim([0, 1])
+
+#     # Move legend outside the plot (on the right)
+#     plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+
+#     # Display the metrics (ECE, TCE, Bias) as text on the plot
+#     text_x = 0.05
+#     text_y = 0.9
+#     if print_errors:
+#         plt.text(text_x, text_y, f'ECE: {ece:.4f}', fontsize=10, color='black')
+#         plt.text(text_x, text_y - 0.1, f'TCE: {tce:.4f}', fontsize=10, color='black')
+#         plt.text(text_x, text_y - 0.2, f'Bias: {bias:.4f}', fontsize=10, color='black')
+
+#     plt.grid(True)
+#     plt.show()
 
 
 
